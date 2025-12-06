@@ -2674,6 +2674,11 @@ function generateToyyibPayLink(orderData) {
     
     // Create unique reference number
     const refNo = `${orderData.customerPhone}`;
+
+ // Calculate expiration time (5 minutes from now)
+ const nowUtc = new Date();
+  const expiryMyTime = new Date(nowUtc.getTime() + (5 + 480) * 60 * 1000);
+  const formattedExpiry = expiryMyTime.toISOString().split('.')[0].replace('T', ' ');
     
     // ==============================
     // TOYYIBPAY API ENDPOINT
@@ -2702,6 +2707,7 @@ function generateToyyibPayLink(orderData) {
     formData.append('billPaymentChannel', '0');
     formData.append('billContentEmail', 'Thank you for your purchase from Q13 DYNAMIC! Your fireworks order is being processed.');
     formData.append('billChargeToCustomer', '1');
+    formData.append("billExpiryDate", formattedExpiry);
     
     // ==============================
     // MAKE API CALL TO TOYYIBPAY
@@ -2846,6 +2852,7 @@ if (customerPhone.includes(' ')) {
                 message += `Discount: -RM ${discount.toFixed(2)}\n`;
             }
             message += `Total Amount: RM ${totalPrice.toFixed(2)}\n\n`;
+            message += `⚠️ IMPORTANT: Payment link expires in 5 minutes!\n\n`;
             message += `You will now be redirected to ToyyibPay secure payment page.\n\n`;
             message += `Note: C.O.D charges apply upon delivery based on distance.\n\n`;
             
