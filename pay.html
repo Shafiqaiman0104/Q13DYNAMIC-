@@ -73,7 +73,7 @@
 const params = new URLSearchParams(window.location.search);
 
 // ✅ Both constants defined
-const toyyibStatus = params.get('status'); // ToyyibPay: 1=success, 2=pending, 3=fail
+const toyyibStatus = params.get('status_id'); // ToyyibPay: 1=success, 2=pending, 3=fail
 const billcode = params.get('billcode'); // Get billcode parameter
 
 // ToyyibPay logic
@@ -88,6 +88,7 @@ if(toyyibStatus){
 </script>
 </body>
 </html>
+
 
 
 
