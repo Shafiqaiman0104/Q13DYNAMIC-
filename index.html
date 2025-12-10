@@ -1771,7 +1771,9 @@ body.splash-active {
                             <span style="color: var(--dark-gray);">Customer Name:</span>
                             <p id="customer-name-display" style="font-weight: 600; margin-top: 5px;">-</p>
                             <span style="color: var(--dark-gray);">Product Code:</span>
-                            <p id="customer-productCode-display" style="font-weight: 600; margin-top: 5px;">-</p>                            
+                            <p id="customer-productCode-display" style="font-weight: 600; margin-top: 5px;">-</p>
+                            <span style="color: var(--dark-gray);">Product Quantity:</span>
+                            <p id="customer-productQuantity-display" style="font-weight: 600; margin-top: 5px;">-</p>                               
                         </div>
                     </div>
                 </div>
@@ -4010,6 +4012,7 @@ function updateOrderTracking(orderData) {
     document.getElementById('order-id-display').textContent = orderData.orderId || '-';
     document.getElementById('customer-name-display').textContent = orderData.customerName || '-';
     document.getElementById('customer-productCode-display').textContent = orderData.productCode || '-';
+    document.getElementById('customer-productQuantity-display').textContent = orderData.productQuantity || '-';
     document.getElementById('payment-status-display').textContent = orderData.paymentStatus || '-';
     
     // Determine progress percentage based on logic
