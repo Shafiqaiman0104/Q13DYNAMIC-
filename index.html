@@ -1792,16 +1792,65 @@ body.splash-active {
     </div>
 </section>
 
-<section id="agent" style="padding: 60px 0; background: white; display: none;">
+<!-- Agent Section -->
+<section id="agent" style="padding: 60px 0; background: #f8fafc; display: none;">
     <div class="container">
         <h2 style="text-align: center; margin-bottom: 30px;">Become an Agent</h2>
-        <div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 16px; box-shadow: var(--card-shadow);">
-            <i class="fas fa-user-tie" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
-            <h3>Agent Program</h3>
-            <p>Interested in becoming a Q13 DYNAMIC agent? Contact us for partnership opportunities.</p>
-            <button class="filter-btn" style="margin-top: 20px; background-color: var(--primary); color: white;">
-                <i class="fas fa-envelope"></i> Contact for Details
-            </button>
+        
+        <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: var(--card-shadow); padding: 40px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <i class="fas fa-user-tie" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 10px;">Join Our Agent Program</h3>
+                <p style="color: var(--dark-gray); margin-bottom: 5px;">Fill out the form below to become an authorized Q13 DYNAMIC agent.</p>
+                <p style="color: var(--primary); font-weight: 600; font-size: 0.9rem;">
+                    Agent ID will be generated automatically from your information
+                </p>
+            </div>
+            
+            <form id="agent-form">
+                <div class="form-group">
+                    <label for="agent-name">Full Name *</label>
+                    <input type="text" id="agent-name" class="form-control" required 
+                           placeholder="Enter your full name (e.g., shafiq aiman bin hairol rizal)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="agent-phone">Phone Number *</label>
+                    <input type="tel" id="agent-phone" class="form-control" required 
+                           placeholder="Enter your phone number (e.g., 601160801477)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="agent-email">Email Address *</label>
+                    <input type="email" id="agent-email" class="form-control" required 
+                           placeholder="Enter your email address (e.g., shafiqaiman0104@gmail.com)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="agent-address">Address *</label>
+                    <textarea id="agent-address" class="form-control" rows="3" required 
+                              placeholder="Enter your complete address"></textarea>
+                </div>
+                
+                <div class="form-group" id="agent-id-preview" style="display: none;">
+                    <label>Your Agent ID will be:</label>
+                    <div style="background: #f0f9ff; border: 2px solid var(--primary); border-radius: 10px; padding: 12px; font-weight: 700; color: var(--primary); text-align: center;">
+                        <span id="preview-agent-id"></span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--dark-gray); margin-top: 8px;">
+                        <i class="fas fa-info-circle"></i> Generated from: Last 4 chars of name + last 4 digits of phone + first 4 chars of email
+                    </p>
+                </div>
+                
+                <div class="order-buttons" style="margin-top: 25px;">
+                    <button type="submit" class="submit-order-btn" id="submit-agent-btn">
+                        <i class="fas fa-user-plus"></i> Submit Application
+                    </button>
+                    <button type="button" class="cancel-order-btn" id="cancel-agent-btn">Cancel</button>
+                </div>
+            </form>
+            
+            <div id="agent-message" style="display: none; margin-top: 20px;"></div>
         </div>
     </div>
 </section>
@@ -2053,6 +2102,9 @@ body.splash-active {
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
 
   const CUST_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
+
+// AGENT FORM FUNCTIONS
+const AGENT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
        
 
         // Global variables
@@ -3501,15 +3553,11 @@ function initializePage() {
         // Start the page when DOM is loaded
         document.addEventListener("DOMContentLoaded", () => {
 
-    const contactBtn = document.querySelector('#agent .filter-btn');
-    if (contactBtn) {
-        contactBtn.addEventListener('click', () => {
-            alert('For agent partnership inquiries, please contact us at:\n\nPhone: 601160801477\nEmail: venturerush.dev@gmail.com\n\nWe will get back to you within 24 hours.');
-        });
-    }
-
 // Initialize sections
 initializeSections();
+
+// Initialize agent form
+initializeAgentForm();
 
             logMobileInfo();
             checkServiceWorkerIssues();
@@ -3624,6 +3672,199 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// Generate Agent ID based on the rules
+function generateAgentId(name, phone, email) {
+    // 1. Get last 4 characters of the name (from the back)
+    // Remove spaces and get last 4 characters
+    const namePart = name.replace(/\s+/g, '').slice(-4).toLowerCase();
+    
+    // 2. Get last 4 numbers of the phone (from the back)
+    const phonePart = phone.replace(/\D/g, '').slice(-4);
+    
+    // 3. Get first 4 characters of the email (from the front, before @)
+    const emailUser = email.split('@')[0];
+    const emailPart = emailUser.slice(0, 4).toLowerCase();
+    
+    // Combine all parts
+    return namePart + phonePart + emailPart;
+}
+
+// Preview Agent ID as user types
+function setupAgentFormPreview() {
+    const nameInput = document.getElementById('agent-name');
+    const phoneInput = document.getElementById('agent-phone');
+    const emailInput = document.getElementById('agent-email');
+    const previewDiv = document.getElementById('agent-id-preview');
+    const previewId = document.getElementById('preview-agent-id');
+    
+    function updatePreview() {
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const email = emailInput.value.trim();
+        
+        if (name && phone && email) {
+            const agentId = generateAgentId(name, phone, email);
+            previewId.textContent = agentId;
+            previewDiv.style.display = 'block';
+        } else {
+            previewDiv.style.display = 'none';
+        }
+    }
+    
+    nameInput.addEventListener('input', updatePreview);
+    phoneInput.addEventListener('input', updatePreview);
+    emailInput.addEventListener('input', updatePreview);
+}
+
+// Handle agent form submission
+async function handleAgentSubmit(event) {
+    event.preventDefault();
+    
+    // Get form data
+    const name = document.getElementById('agent-name').value.trim();
+    const phone = document.getElementById('agent-phone').value.trim();
+    const email = document.getElementById('agent-email').value.trim();
+    const address = document.getElementById('agent-address').value.trim();
+    
+    // Validate required fields
+    if (!name || !phone || !email || !address) {
+        showAgentMessage('Please fill in all required fields.', 'error');
+        return;
+    }
+    
+    // Validate phone number format
+    if (!/^\d+$/.test(phone.replace(/\s+/g, ''))) {
+        showAgentMessage('Phone number should contain only numbers.', 'error');
+        return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showAgentMessage('Please enter a valid email address.', 'error');
+        return;
+    }
+    
+    // Generate Agent ID
+    const agentId = generateAgentId(name, phone, email);
+    
+    // Prepare data for submission
+    const formData = {
+        agentId: agentId,
+        name: name,
+        phone: phone,
+        email: email,
+        address: address
+    };
+    
+    // Disable submit button
+    const submitBtn = document.getElementById('submit-agent-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    
+    try {
+        // Send data to Google Apps Script
+        const response = await submitAgentForm(formData);
+        
+        if (response.success) {
+            showAgentMessage(`
+                ✅ <strong>Application Submitted Successfully!</strong><br><br>
+                Your Agent ID: <strong>${agentId}</strong><br><br>
+                Please save this ID for future reference.<br>
+                We will contact you within 3 business days.
+            `, 'success');
+            
+            // Reset form after successful submission
+            document.getElementById('agent-form').reset();
+            document.getElementById('agent-id-preview').style.display = 'none';
+        } else {
+            throw new Error(response.message || 'Submission failed');
+        }
+    } catch (error) {
+        showAgentMessage(`❌ Error: ${error.message}<br>Please try again or contact support.`, 'error');
+    } finally {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Submit Application';
+    }
+}
+
+// Submit agent form to Google Apps Script
+async function submitAgentForm(formData) {
+    try {
+        // Create URL with query parameters
+        const url = new URL(AGENT_SCRIPT_URL);
+        url.searchParams.append('agentId', formData.agentId);
+        url.searchParams.append('name', formData.name);
+        url.searchParams.append('phone', formData.phone);
+        url.searchParams.append('email', formData.email);
+        url.searchParams.append('address', formData.address);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors', // Google Apps Script requires no-cors for POST
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        // Note: With no-cors mode, we can't read the response
+        // But we assume it's successful if no network error
+        return { success: true };
+        
+    } catch (error) {
+        console.error('Agent form submission error:', error);
+        throw new Error('Network error. Please check your connection and try again.');
+    }
+}
+
+// Show message in agent form
+function showAgentMessage(message, type) {
+    const messageDiv = document.getElementById('agent-message');
+    messageDiv.innerHTML = message;
+    messageDiv.style.display = 'block';
+    messageDiv.style.padding = '15px';
+    messageDiv.style.borderRadius = '10px';
+    messageDiv.style.marginTop = '20px';
+    
+    if (type === 'success') {
+        messageDiv.style.backgroundColor = '#d1fae5';
+        messageDiv.style.border = '1px solid #10b981';
+        messageDiv.style.color = '#065f46';
+    } else {
+        messageDiv.style.backgroundColor = '#fee2e2';
+        messageDiv.style.border = '1px solid #ef4444';
+        messageDiv.style.color = '#7f1d1d';
+    }
+    
+    // Auto-hide after 10 seconds for success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 10000);
+    }
+}
+
+// Initialize agent form
+function initializeAgentForm() {
+    const agentForm = document.getElementById('agent-form');
+    const cancelBtn = document.getElementById('cancel-agent-btn');
+    
+    if (agentForm) {
+        agentForm.addEventListener('submit', handleAgentSubmit);
+        setupAgentFormPreview();
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            document.getElementById('agent-form').reset();
+            document.getElementById('agent-id-preview').style.display = 'none';
+            document.getElementById('agent-message').style.display = 'none';
+        });
+    }
+}
 
 // Track Order Functions
 async function trackOrder(orderId) {
