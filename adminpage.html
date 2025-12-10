@@ -564,6 +564,301 @@
             color: var(--danger);
             border-color: rgba(239, 68, 68, 0.2);
         }
+/* Mobile-specific improvements */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 10px;
+    }
+    
+    .dashboard-header {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .header-title h1 {
+        font-size: 1.4rem;
+    }
+    
+    .header-title p {
+        font-size: 0.85rem;
+    }
+    
+    .refresh-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .stat-card {
+        padding: 15px;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .stat-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .data-section {
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+    
+    .action-btn {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+    
+    .action-btn i {
+        margin-right: 3px;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .page-btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 35px;
+    }
+    
+    /* Hide some columns on mobile */
+    .data-table th:nth-child(4), /* Product column for orders */
+    .data-table td:nth-child(4),
+    .data-table th:nth-child(5), /* Address column for agents */
+    .data-table td:nth-child(5),
+    .data-table th:nth-child(6), /* Duration column for products */
+    .data-table td:nth-child(6) {
+        display: none;
+    }
+    
+    /* Mobile-friendly tables with card layout */
+    .mobile-table-view {
+        display: block;
+    }
+    
+    .mobile-table-view .data-table {
+        display: block;
+    }
+    
+    .mobile-table-view .data-table thead {
+        display: none;
+    }
+    
+    .mobile-table-view .data-table tbody,
+    .mobile-table-view .data-table tr,
+    .mobile-table-view .data-table td {
+        display: block;
+        width: 100%;
+    }
+    
+    .mobile-table-view .data-table tr {
+        margin-bottom: 15px;
+        border: 1px solid var(--gray);
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+    }
+    
+    .mobile-table-view .data-table td {
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--light-gray);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .mobile-table-view .data-table td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--dark);
+        margin-right: 10px;
+        flex: 0 0 40%;
+    }
+    
+    .mobile-table-view .data-table td:last-child {
+        border-bottom: none;
+    }
+    
+    /* Mobile menu improvements */
+    .sidebar {
+        width: 85%;
+        max-width: 300px;
+    }
+    
+    .sidebar-header {
+        padding: 20px;
+    }
+    
+    .sidebar-logo span {
+        font-size: 1.3rem;
+    }
+    
+    .menu-item {
+        padding: 12px 20px;
+    }
+    
+    /* Improve touch targets */
+    button, 
+    .action-btn,
+    .page-btn,
+    .menu-item {
+        min-height: 44px; /* Minimum touch target size */
+    }
+    
+    input[type="text"],
+    select {
+        min-height: 44px; /* Minimum touch target size */
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+}
+
+/* For tablets (768px and below) */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .table-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    /* Better scrolling for tables */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        border-radius: 8px;
+        border: 1px solid var(--gray);
+    }
+    
+    .data-table {
+        min-width: 600px; /* Ensures table doesn't collapse */
+    }
+}
+
+/* For very small phones */
+@media (max-width: 360px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        padding: 8px;
+    }
+    
+    .stat-info h3 {
+        font-size: 1.3rem;
+    }
+}
+.mobile-only {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: flex !important;
+    }
+    
+    .refresh-btn:not(.mobile-only) {
+        display: none !important;
+    }
+    
+    #mobile-refresh {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        justify-content: center;
+        padding: 0;
+    }
+}
+.back-to-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 99;
+    transition: all 0.3s ease;
+}
+
+.back-to-top-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+    .back-to-top-btn {
+        display: flex;
+    }
+}
+/* Add this to your existing CSS, after the .table-container styles */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    border-radius: 8px;
+}
+
+/* Mobile table view improvements */
+@media (max-width: 480px) {
+    .table-container {
+        border: 1px solid var(--gray);
+        margin-top: 10px;
+    }
+    
+    .mobile-table-view .data-table tr {
+        margin-bottom: 10px;
+        border: 1px solid var(--gray);
+    }
+    
+    .mobile-table-view .data-table td:before {
+        flex: 0 0 45%;
+        font-size: 0.8rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -623,6 +918,10 @@
                     <button class="refresh-btn" id="refresh-all">
                         <i class="fas fa-sync-alt"></i> Refresh All Data
                     </button>
+<!-- Add this inside your header-actions div -->
+<button class="refresh-btn mobile-only" id="mobile-refresh" style="display: none;">
+    <i class="fas fa-sync-alt"></i>
+</button>
                 </div>
             </header>
 
@@ -881,52 +1180,64 @@
         const pageSubtitle = document.getElementById('page-subtitle');
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            setupEventListeners();
-            loadAllData();
+document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    setupMobileFeatures(); // Make sure this is called
+    loadAllData();
+    
+    // Check if we're on mobile initially
+    if (window.innerWidth <= 480) {
+        enableMobileTableView();
+    }
+});
+
+// Update your setupEventListeners function:
+function setupEventListeners() {
+    // Mobile menu toggle
+    mobileToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
+
+    // Menu navigation
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const sectionId = item.dataset.section;
+            
+            // Update active menu item
+            menuItems.forEach(mi => mi.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Update active section
+            sections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(`${sectionId}-section`).classList.add('active');
+            
+            // Update page title
+            updatePageTitle(sectionId);
+            
+            // Close mobile menu on selection
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.remove('active');
+            }
         });
+    });
 
-        // Setup event listeners
-        function setupEventListeners() {
-            // Mobile menu toggle
-            mobileToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
+    // Refresh all data - BOTH buttons
+    refreshBtn.addEventListener('click', loadAllData);
+    
+    // Mobile refresh button
+    const mobileRefreshBtn = document.getElementById('mobile-refresh');
+    if (mobileRefreshBtn) {
+        mobileRefreshBtn.addEventListener('click', loadAllData);
+    }
 
-            // Menu navigation
-            menuItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const sectionId = item.dataset.section;
-                    
-                    // Update active menu item
-                    menuItems.forEach(mi => mi.classList.remove('active'));
-                    item.classList.add('active');
-                    
-                    // Update active section
-                    sections.forEach(sec => sec.classList.remove('active'));
-                    document.getElementById(`${sectionId}-section`).classList.add('active');
-                    
-                    // Update page title
-                    updatePageTitle(sectionId);
-                    
-                    // Close mobile menu on selection
-                    if (window.innerWidth <= 1024) {
-                        sidebar.classList.remove('active');
-                    }
-                });
-            });
-
-            // Refresh all data
-            refreshBtn.addEventListener('click', loadAllData);
-
-            // Search and filter listeners
-            document.getElementById('orders-search').addEventListener('input', filterOrders);
-            document.getElementById('orders-filter').addEventListener('change', filterOrders);
-            document.getElementById('agents-search').addEventListener('input', filterAgents);
-            document.getElementById('products-search').addEventListener('input', filterProducts);
-            document.getElementById('products-filter').addEventListener('change', filterProducts);
-        }
+    // Search and filter listeners
+    document.getElementById('orders-search').addEventListener('input', filterOrders);
+    document.getElementById('orders-filter').addEventListener('change', filterOrders);
+    document.getElementById('agents-search').addEventListener('input', filterAgents);
+    document.getElementById('products-search').addEventListener('input', filterProducts);
+    document.getElementById('products-filter').addEventListener('change', filterProducts);
+}
 
         // Update page title
         function updatePageTitle(sectionId) {
@@ -1263,157 +1574,189 @@ async function loadProductsData() {
             renderProductsTable();
         }
 
-        // Render orders table
-        function renderOrdersTable() {
-            const tbody = document.getElementById('orders-body');
-            const pagination = document.getElementById('orders-pagination');
-            
-            if (filteredData.orders.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="9" class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <p>No orders found</p>
-                        </td>
-                    </tr>
-                `;
-                pagination.innerHTML = '';
-                return;
-            }
-            
-            // Calculate pagination
-            const totalPages = Math.ceil(filteredData.orders.length / itemsPerPage);
-            const startIndex = (currentPage.orders - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = filteredData.orders.slice(startIndex, endIndex);
-            
-            // Render table rows
-            tbody.innerHTML = pageData.map(order => `
-                <tr>
-                    <td>${formatDate(order.timestamp)}</td>
-                    <td>${escapeHtml(order.name || '')}</td>
-                    <td>${escapeHtml(order.phone || '')}</td>
-                    <td>${escapeHtml(order.productCode || '')} - ${escapeHtml(order.productName || '')}</td>
-                    <td>${order.productQuantity || 0}</td>
-                    <td>RM ${(order.total || 0).toFixed(2)}</td>
-                    <td>
-                        <span class="status-badge ${order.paymentStatus === 'paid' ? 'status-paid' : 'status-pending'}">
-                            ${order.paymentStatus || 'pending'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="status-badge ${order.deliveryStatus === 'delivered' ? 'status-delivered' : 'status-pending'}">
-                            ${order.deliveryStatus || 'pending'}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="action-btn view" onclick="viewOrder('${order.billCode || ''}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-            
-            // Render pagination
-            renderPagination('orders', totalPages);
-        }
+// Update table rendering functions to be mobile-aware
+function renderOrdersTable() {
+    const tbody = document.getElementById('orders-body');
+    const pagination = document.getElementById('orders-pagination');
+    
+    if (filteredData.orders.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <p>No orders found</p>
+                </td>
+            </tr>
+        `;
+        pagination.innerHTML = '';
+        return;
+    }
+    
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredData.orders.length / itemsPerPage);
+    const startIndex = (currentPage.orders - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageData = filteredData.orders.slice(startIndex, endIndex);
+    
+    // Mobile-friendly labels
+    const isMobile = window.innerWidth <= 480;
+    
+    // Render table rows
+    tbody.innerHTML = pageData.map(order => {
+        // Truncate text for mobile
+        const productDisplay = isMobile 
+            ? `${escapeHtml(order.productCode || '').substring(0, 10)}${(order.productCode || '').length > 10 ? '...' : ''}`
+            : `${escapeHtml(order.productCode || '')} - ${escapeHtml(order.productName || '')}`;
+        
+        return `
+            <tr>
+                <td data-label="Timestamp">${formatDate(order.timestamp)}</td>
+                <td data-label="Name">${escapeHtml(order.name || '')}</td>
+                <td data-label="Phone">${escapeHtml(order.phone || '')}</td>
+                <td data-label="Product">${productDisplay}</td>
+                <td data-label="Qty">${order.productQuantity || 0}</td>
+                <td data-label="Total">RM ${(order.total || 0).toFixed(2)}</td>
+                <td data-label="Payment">
+                    <span class="status-badge ${order.paymentStatus === 'paid' ? 'status-paid' : 'status-pending'}">
+                        ${order.paymentStatus || 'pending'}
+                    </span>
+                </td>
+                <td data-label="Delivery">
+                    <span class="status-badge ${order.deliveryStatus === 'delivered' ? 'status-delivered' : 'status-pending'}">
+                        ${order.deliveryStatus || 'pending'}
+                    </span>
+                </td>
+                <td data-label="Actions">
+                    <button class="action-btn view" onclick="viewOrder('${order.billCode || ''}')">
+                        <i class="fas fa-eye"></i> ${isMobile ? '' : 'View'}
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Render pagination
+    renderPagination('orders', totalPages);
+    
+    // Apply mobile view if needed
+    if (isMobile) enableMobileTableView();
+}     
 
-        // Render agents table
-        function renderAgentsTable() {
-            const tbody = document.getElementById('agents-body');
-            const pagination = document.getElementById('agents-pagination');
-            
-            if (filteredData.agents.length === 0) {
-                // Show empty state message
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <p>No agents found</p>
-                        </td>
-                    </tr>
-                `;
-                pagination.innerHTML = '';
-                return;
-            }
-            
-            // Calculate pagination
-            const totalPages = Math.ceil(filteredData.agents.length / itemsPerPage);
-            const startIndex = (currentPage.agents - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = filteredData.agents.slice(startIndex, endIndex);
-            
-            // Render table rows
-            tbody.innerHTML = pageData.map(agent => `
-                <tr>
-                    <td><strong>${escapeHtml(agent.agentId || '')}</strong></td>
-                    <td>${escapeHtml(agent.name || '')}</td>
-                    <td>${escapeHtml(agent.phone || '')}</td>
-                    <td>${escapeHtml(agent.email || '')}</td>
-                    <td>${escapeHtml((agent.address || '').substring(0, 30))}${(agent.address || '').length > 30 ? '...' : ''}</td>
-                    <td>${formatDate(agent.timestamp)}</td>
-                    <td>
-                        <button class="action-btn view" onclick="viewAgent('${agent.agentId || ''}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-            
-            // Render pagination
-            renderPagination('agents', totalPages);
-        }
+// Update renderAgentsTable function:
+function renderAgentsTable() {
+    const tbody = document.getElementById('agents-body');
+    const pagination = document.getElementById('agents-pagination');
+    
+    if (filteredData.agents.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <p>No agents found</p>
+                </td>
+            </tr>
+        `;
+        pagination.innerHTML = '';
+        return;
+    }
+    
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredData.agents.length / itemsPerPage);
+    const startIndex = (currentPage.agents - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageData = filteredData.agents.slice(startIndex, endIndex);
+    
+    // Mobile-friendly labels
+    const isMobile = window.innerWidth <= 480;
+    
+    // Render table rows
+    tbody.innerHTML = pageData.map(agent => {
+        // Truncate text for mobile
+        const addressDisplay = isMobile 
+            ? `${escapeHtml(agent.address || '').substring(0, 20)}${(agent.address || '').length > 20 ? '...' : ''}`
+            : `${escapeHtml((agent.address || '').substring(0, 30))}${(agent.address || '').length > 30 ? '...' : ''}`;
+        
+        return `
+            <tr>
+                <td data-label="Agent ID"><strong>${escapeHtml(agent.agentId || '')}</strong></td>
+                <td data-label="Name">${escapeHtml(agent.name || '')}</td>
+                <td data-label="Phone">${escapeHtml(agent.phone || '')}</td>
+                <td data-label="Email">${escapeHtml(agent.email || '')}</td>
+                <td data-label="Address">${addressDisplay}</td>
+                <td data-label="Timestamp">${formatDate(agent.timestamp)}</td>
+                <td data-label="Actions">
+                    <button class="action-btn view" onclick="viewAgent('${agent.agentId || ''}')">
+                        <i class="fas fa-eye"></i> ${isMobile ? '' : 'View'}
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Render pagination
+    renderPagination('agents', totalPages);
+    
+    // Apply mobile view if needed
+    if (isMobile) enableMobileTableView();
+}
+       
 
-        // Render products table
-        function renderProductsTable() {
-            const tbody = document.getElementById('products-body');
-            const pagination = document.getElementById('products-pagination');
-            
-            if (filteredData.products.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <p>No products found</p>
-                        </td>
-                    </tr>
-                `;
-                pagination.innerHTML = '';
-                return;
-            }
-            
-            // Calculate pagination
-            const totalPages = Math.ceil(filteredData.products.length / itemsPerPage);
-            const startIndex = (currentPage.products - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageData = filteredData.products.slice(startIndex, endIndex);
-            
-            // Render table rows
-            tbody.innerHTML = pageData.map(product => `
-                <tr>
-                    <td><strong>${escapeHtml(product.code || '')}</strong></td>
-                    <td>${escapeHtml(product.name || '')}</td>
-                    <td>${product.shot || 0}</td>
-                    <td>
-                        <span class="status-badge ${(product.style || '') === 'V' ? 'status-paid' : 'status-delivered'}">
-                            ${product.style || ''} Style
-                        </span>
-                    </td>
-                    <td>${product.inch || 0}"</td>
-                    <td>${formatDuration(product.duration || '')}</td>
-                    <td><strong>RM ${(product.price || 0).toFixed(2)}</strong></td>
-                    <td>
-                        <button class="action-btn view" onclick="viewProduct('${product.code || ''}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-            
-            // Render pagination
-            renderPagination('products', totalPages);
-        }
-
+// Update renderProductsTable function:
+function renderProductsTable() {
+    const tbody = document.getElementById('products-body');
+    const pagination = document.getElementById('products-pagination');
+    
+    if (filteredData.products.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <p>No products found</p>
+                </td>
+            </tr>
+        `;
+        pagination.innerHTML = '';
+        return;
+    }
+    
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredData.products.length / itemsPerPage);
+    const startIndex = (currentPage.products - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageData = filteredData.products.slice(startIndex, endIndex);
+    
+    // Mobile-friendly labels
+    const isMobile = window.innerWidth <= 480;
+    
+    // Render table rows
+    tbody.innerHTML = pageData.map(product => `
+        <tr>
+            <td data-label="Code"><strong>${escapeHtml(product.code || '')}</strong></td>
+            <td data-label="Name">${escapeHtml(product.name || '')}</td>
+            <td data-label="Shots">${product.shot || 0}</td>
+            <td data-label="Style">
+                <span class="status-badge ${(product.style || '') === 'V' ? 'status-paid' : 'status-delivered'}">
+                    ${product.style || ''} Style
+                </span>
+            </td>
+            <td data-label="Inch">${product.inch || 0}"</td>
+            <td data-label="Duration">${formatDuration(product.duration || '')}</td>
+            <td data-label="Price"><strong>RM ${(product.price || 0).toFixed(2)}</strong></td>
+            <td data-label="Actions">
+                <button class="action-btn view" onclick="viewProduct('${product.code || ''}')">
+                    <i class="fas fa-eye"></i> ${isMobile ? '' : 'View'}
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Render pagination
+    renderPagination('products', totalPages);
+    
+    // Apply mobile view if needed
+    if (isMobile) enableMobileTableView();
+}
+ 
         // Render pagination
         function renderPagination(type, totalPages) {
             const pagination = document.getElementById(`${type}-pagination`);
@@ -1479,28 +1822,27 @@ async function loadProductsData() {
 
         // View order details
         function viewOrder(billCode) {
-            const order = allData.orders.find(o => o.billCode === billCode);
-            if (!order) {
-                alert('Order not found');
-                return;
-            }
-            
-            const details = `
-                <h3>Order Details</h3>
-                <p><strong>Bill Code:</strong> ${order.billCode || 'N/A'}</p>
-                <p><strong>Customer:</strong> ${order.name || 'N/A'}</p>
-                <p><strong>Phone:</strong> ${order.phone || 'N/A'}</p>
-                <p><strong>Email:</strong> ${order.email || 'N/A'}</p>
-                <p><strong>Product:</strong> ${order.productCode || 'N/A'} - ${order.productName || 'N/A'}</p>
-                <p><strong>Quantity:</strong> ${order.productQuantity || 0}</p>
-                <p><strong>Total:</strong> RM ${(order.total || 0).toFixed(2)}</p>
-                <p><strong>Payment Status:</strong> ${order.paymentStatus || 'pending'}</p>
-                <p><strong>Delivery Status:</strong> ${order.deliveryStatus || 'pending'}</p>
-                <p><strong>Note:</strong> ${order.note || 'None'}</p>
-            `;
-            
-            alert(details);
-        }
+    const order = allData.orders.find(o => o.billCode === billCode);
+    if (!order) {
+        showMobileAlert('Error', 'Order not found');
+        return;
+    }
+    
+    const details = `
+        <p><strong>Bill Code:</strong> ${order.billCode || 'N/A'}</p>
+        <p><strong>Customer:</strong> ${order.name || 'N/A'}</p>
+        <p><strong>Phone:</strong> ${order.phone || 'N/A'}</p>
+        <p><strong>Email:</strong> ${order.email || 'N/A'}</p>
+        <p><strong>Product:</strong> ${order.productCode || 'N/A'} - ${order.productName || 'N/A'}</p>
+        <p><strong>Quantity:</strong> ${order.productQuantity || 0}</p>
+        <p><strong>Total:</strong> RM ${(order.total || 0).toFixed(2)}</p>
+        <p><strong>Payment Status:</strong> ${order.paymentStatus || 'pending'}</p>
+        <p><strong>Delivery Status:</strong> ${order.deliveryStatus || 'pending'}</p>
+        <p><strong>Note:</strong> ${order.note || 'None'}</p>
+    `;
+    
+    showMobileAlert('Order Details', details);
+}
 
         // View agent details
         function viewAgent(agentId) {
@@ -1520,7 +1862,7 @@ async function loadProductsData() {
                 <p><strong>Registered:</strong> ${formatDate(agent.timestamp)}</p>
             `;
             
-            alert(details);
+           showMobileAlert('Agent Details', details);
         }
 
         // View product details
@@ -1544,7 +1886,7 @@ async function loadProductsData() {
                 ${product.video ? `<p><strong>Video:</strong> ${product.video}</p>` : ''}
             `;
             
-            alert(details);
+           showMobileAlert('Product Details', details);
         }
 
         // Utility functions
@@ -1613,6 +1955,191 @@ async function loadProductsData() {
         window.viewOrder = viewOrder;
         window.viewAgent = viewAgent;
         window.viewProduct = viewProduct;
+
+// Touch and mobile-specific enhancements
+function setupMobileFeatures() {
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 1024 && 
+            sidebar.classList.contains('active') &&
+            !sidebar.contains(e.target) &&
+            !mobileToggle.contains(e.target)) {
+            sidebar.classList.remove('active');
+        }
+    });
+    
+    // Add swipe to close sidebar on mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    document.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        // Swipe right to open sidebar (if closed)
+        if (swipeDistance > swipeThreshold && 
+            touchStartX < 50 && 
+            !sidebar.classList.contains('active')) {
+            sidebar.classList.add('active');
+        }
+        
+        // Swipe left to close sidebar (if open)
+        if (swipeDistance < -swipeThreshold && 
+            sidebar.classList.contains('active') &&
+            touchStartX > window.innerWidth * 0.2) {
+            sidebar.classList.remove('active');
+        }
+    }
+    
+    // Prevent zoom on double-tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+    
+    // Adjust table layout for mobile
+    window.addEventListener('resize', debounce(() => {
+        if (window.innerWidth <= 480) {
+            enableMobileTableView();
+        } else {
+            disableMobileTableView();
+        }
+    }, 250));
+}
+
+// Enable mobile-friendly table view
+function enableMobileTableView() {
+    const containers = document.querySelectorAll('.table-container');
+    containers.forEach(container => {
+        if (container.querySelector('.data-table')) {
+            container.classList.add('mobile-table-view');
+            const table = container.querySelector('.data-table');
+            
+            // Add data-labels to table cells if not already present
+            const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
+            const rows = table.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach((cell, index) => {
+                    if (headers[index] && !cell.hasAttribute('data-label')) {
+                        cell.setAttribute('data-label', headers[index]);
+                    }
+                });
+            });
+        }
+    });
+}
+
+// Mobile-friendly alert function
+function showMobileAlert(title, content) {
+    if (window.innerWidth <= 768) {
+        // Create mobile-friendly modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        `;
+        
+        modalContent.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: var(--dark);">${title}</h3>
+                <button onclick="this.closest('div[style*=\\'background: rgba(0,0,0,0.5)\\']').remove()" 
+                        style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--dark-gray);">
+                    &times;
+                </button>
+            </div>
+            <div style="color: var(--dark-gray);">${content}</div>
+        `;
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    } else {
+        // Use regular alert for desktop
+        alert(`${title}\n\n${content}`);
+    }
+}
+
+// Disable mobile table view
+function disableMobileTableView() {
+    const containers = document.querySelectorAll('.table-container');
+    containers.forEach(container => {
+        container.classList.remove('mobile-table-view');
+    });
+}
+
+// Debounce function for resize events
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Back to top functionality
+const backToTopBtn = document.getElementById('back-to-top');
+if (backToTopBtn) {
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopBtn.style.display = 'flex';
+        } else {
+            backToTopBtn.style.display = 'none';
+        }
+    });
+}
     </script>
+<!-- Back to top button for mobile -->
+<button id="back-to-top" class="back-to-top-btn">
+    <i class="fas fa-arrow-up"></i>
+</button>
 </body>
 </html>
