@@ -1811,7 +1811,7 @@ body.splash-active {
                 <div class="form-group">
                     <label for="agent-name">Full Name *</label>
                     <input type="text" id="agent-name" class="form-control" required 
-                           placeholder="Enter your full name (e.g., shafiq aiman bin hairol rizal)">
+                           placeholder="Enter your full name">
                 </div>
                 
                 <div class="form-group">
@@ -1823,7 +1823,7 @@ body.splash-active {
                 <div class="form-group">
                     <label for="agent-email">Email Address *</label>
                     <input type="email" id="agent-email" class="form-control" required 
-                           placeholder="Enter your email address (e.g., shafiqaiman0104@gmail.com)">
+                           placeholder="Enter your email address">
                 </div>
                 
                 <div class="form-group">
@@ -3704,7 +3704,9 @@ function setupAgentFormPreview() {
         const email = emailInput.value.trim();
         
         if (name && phone && email) {
-            const agentId = generateAgentId(name, phone, email);
+            // Clean phone for preview (same logic as validation)
+            const cleanedPhone = phone.replace(/\s+|-|\+/g, '');
+            const agentId = generateAgentId(name, cleanedPhone, email);
             previewId.textContent = agentId;
             previewDiv.style.display = 'block';
         } else {
@@ -3733,11 +3735,47 @@ async function handleAgentSubmit(event) {
         return;
     }
     
-    // Validate phone number format
-    if (!/^\d+$/.test(phone.replace(/\s+/g, ''))) {
-        showAgentMessage('Phone number should contain only numbers.', 'error');
+    // ========== SAME PHONE VALIDATION AS ORDER FORM ==========
+    // Validate phone number - must start with 6 (no starting with 0)
+    // Remove all spaces, dashes, and plus signs
+    const cleanedPhone = phone.replace(/\s+|-|\+/g, '');
+
+    // Check if phone has symbol
+    if (/[+\-()]/.test(phone)) {
+        showAgentMessage('Phone number cannot contain symbols like +, -, (, ).\n\nPlease use only numbers (e.g., 601160801477).', 'error');
         return;
     }
+
+    // Check if phone has spaces
+    if (phone.includes(' ')) {
+        showAgentMessage('Phone number cannot contain spaces.\n\nPlease remove spaces (e.g., 601160801477 instead of 6011 6080 1477).', 'error');
+        return;
+    }
+    
+    // Check if phone starts with 0
+    if (cleanedPhone.startsWith('0')) {
+        showAgentMessage('Phone number should start with "6" (e.g., 60123456789), not with "0".\n\nPlease remove the leading 0 and start with 6.', 'error');
+        return;
+    }
+    
+    // Check if phone starts with 6 and has valid length (10-11 digits for Malaysian numbers)
+    if (!cleanedPhone.startsWith('6')) {
+        showAgentMessage('Phone number should start with "6" (e.g., 60123456789).\n\nPlease enter a valid Malaysian phone number starting with 6.', 'error');
+        return;
+    }
+    
+    // Check total length (should be 10-11 digits for Malaysian numbers: 601X-XXX-XXXX or 601XX-XXX-XXXX)
+    if (cleanedPhone.length < 10 || cleanedPhone.length > 15) {
+        showAgentMessage('Phone number should be 10-11 digits starting with "6" (e.g., 60123456789).\n\nPlease enter a valid Malaysian phone number.', 'error');
+        return;
+    }
+    
+    // Check if all characters are numbers
+    if (!/^\d+$/.test(cleanedPhone)) {
+        showAgentMessage('Phone number should contain only numbers.\n\nPlease enter a valid Malaysian phone number (e.g., 60123456789).', 'error');
+        return;
+    }
+    // ========== END PHONE VALIDATION ==========
     
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -3746,14 +3784,14 @@ async function handleAgentSubmit(event) {
         return;
     }
     
-    // Generate Agent ID
-    const agentId = generateAgentId(name, phone, email);
+    // Generate Agent ID (use cleaned phone without symbols)
+    const agentId = generateAgentId(name, cleanedPhone, email);
     
     // Prepare data for submission
     const formData = {
         agentId: agentId,
         name: name,
-        phone: phone,
+        phone: cleanedPhone, // Use cleaned phone number
         email: email,
         address: address
     };
