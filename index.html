@@ -2012,6 +2012,15 @@ body.splash-active {
                     <span class="order-label">Product Price:</span>
                     <span class="order-value" id="order-product-price">RM 0</span>
                 </div>
+<!-- Add this after the product price section -->
+<div class="order-item">
+    <span class="order-label">Quantity:</span>
+    <div class="quantity-controls" style="display: flex; align-items: center; gap: 10px;">
+        <button type="button" class="quantity-btn" id="decrease-qty" style="width: 30px; height: 30px; border-radius: 50%; background: var(--gray); border: none; cursor: pointer;">-</button>
+        <input type="number" id="product-quantity" value="1" min="1" max="10" style="width: 60px; text-align: center; padding: 5px; border: 2px solid var(--gray); border-radius: 8px;">
+        <button type="button" class="quantity-btn" id="increase-qty" style="width: 30px; height: 30px; border-radius: 50%; background: var(--gray); border: none; cursor: pointer;">+</button>
+    </div>
+</div>
                 <div class="order-item">
                     <span class="order-label">Admin Fee:</span>
                     <span class="order-value" id="order-payment-fee">RM 1</span>
@@ -3011,8 +3020,9 @@ function openOrderModal(product) {
     // Update order details
     orderProductName.textContent = `${product.code} - ${product.name}`;
     
-    // Reset form
+    // Reset form AND quantity
     orderForm.reset();
+    document.getElementById('product-quantity').value = 1; // Reset to 1
     submitOrderBtn.disabled = false;
     
     // Calculate total price with discount
@@ -3046,18 +3056,24 @@ function calculateTotalPrice() {
 function updateOrderSummary() {
     if (!currentOrderProduct) return;
     
-    const productPrice = currentOrderProduct.price || 0;
+    // Get quantity
+    const quantityInput = document.getElementById('product-quantity');
+    const quantity = parseInt(quantityInput.value) || 1;
+    
+    // Calculate product price based on quantity
+    const productPricePerUnit = currentOrderProduct.price || 0;
+    const totalProductPrice = productPricePerUnit * quantity;
     const paymentFee = 1;
     
     // Check if product is eligible for discount (≥ RM500)
-    const isEligibleForDiscount = productPrice >= 500;
+    const isEligibleForDiscount = totalProductPrice >= 500;
     
     // Only apply discount if product is eligible AND user has a saved prize
     const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
-    const totalPrice = productPrice + paymentFee - discount;
+    const totalPrice = totalProductPrice + paymentFee - discount;
     
     // Update order summary display
-    orderProductPrice.textContent = `RM ${productPrice.toFixed(2)}`;
+    orderProductPrice.textContent = `RM ${totalProductPrice.toFixed(2)} (${quantity} × RM ${productPricePerUnit.toFixed(2)})`;
     orderTotalPrice.textContent = `RM ${totalPrice.toFixed(2)}`;
     
     // Add discount line to order summary
@@ -3135,7 +3151,7 @@ function generateToyyibPayLink(orderData) {
     formData.append('userSecretKey', TOYYIBPAY_SECRET_KEY);
     formData.append('categoryCode', TOYYIBPAY_CATEGORY_CODE);
     formData.append('billName', `Q13 DYNAMIC - ${orderData.productCode}`);
-    formData.append('billDescription', `Purchase: ${orderData.productCode} ${orderData.productName}`);
+    formData.append('billDescription', `Purchase: ${orderData.productCode} ${orderData.productName} (Qty: ${orderData.productQuantity})`);
     formData.append('billPriceSetting', '1');
     formData.append('billPayorInfo', '1');
     formData.append('billAmount', amountInSen.toString());
@@ -3195,6 +3211,7 @@ async function handleOrderSubmit(event) {
     const customerEmail = document.getElementById('customer-email').value;
     const deliveryAddress = document.getElementById('delivery-address').value;
     const customerNote = document.getElementById('customer-note').value;
+    const productQuantity = document.getElementById('product-quantity').value;
     
     // Validate form data
     if (!customerName || !customerPhone || !customerEmail || !deliveryAddress) {
@@ -3248,15 +3265,21 @@ if (customerPhone.includes(' ')) {
         alert('Please enter a valid email address.');
         return;
     }
+
+    // Calculate prices with quantity
+    const quantity = parseInt(productQuantity) || 1;
+    const productPricePerUnit = currentOrderProduct.price || 0;
+    const totalProductPrice = productPricePerUnit * quantity;
+    const paymentFee = 1;
     
     // Disable submit button while processing
     submitOrderBtn.disabled = true;
     submitOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     
-    // Get discount - only if product is eligible (≥ RM500)
-    const isEligibleForDiscount = currentOrderProduct.price >= 500;
+    // Check if product is eligible for discount (total price ≥ RM500)
+    const isEligibleForDiscount = totalProductPrice >= 500;
     const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
-    const totalPrice = calculateTotalPrice() - discount;
+    const totalPrice = totalProductPrice + paymentFee - discount;
     
     // Create order data object
     const orderData = {
@@ -3264,6 +3287,7 @@ if (customerPhone.includes(' ')) {
         productCode: currentOrderProduct.code,
         productName: currentOrderProduct.name,
         productPrice: currentOrderProduct.price,
+        productQuantity: quantity, // ADD THIS
         discount: discount, // Add discount to order data
         customerName: customerName,
         customerPhone: customerPhone,
@@ -3558,6 +3582,42 @@ initializeSections();
 
 // Initialize agent form
 initializeAgentForm();
+
+// Add quantity button event listeners
+document.getElementById('increase-qty').addEventListener('click', () => {
+    const quantityInput = document.getElementById('product-quantity');
+    let quantity = parseInt(quantityInput.value) || 1;
+    if (quantity < 10) {
+        quantityInput.value = quantity + 1;
+        updateOrderSummary();
+    }
+});
+
+document.getElementById('decrease-qty').addEventListener('click', () => {
+    const quantityInput = document.getElementById('product-quantity');
+    let quantity = parseInt(quantityInput.value) || 1;
+    if (quantity > 1) {
+        quantityInput.value = quantity - 1;
+        updateOrderSummary();
+    }
+});
+
+// Update summary when quantity input changes
+document.getElementById('product-quantity').addEventListener('change', () => {
+    const quantityInput = document.getElementById('product-quantity');
+    let quantity = parseInt(quantityInput.value) || 1;
+    
+    // Ensure quantity is within limits
+    if (quantity < 1) quantity = 1;
+    if (quantity > 10) quantity = 10;
+    
+    quantityInput.value = quantity;
+    updateOrderSummary();
+});
+
+// Also update when quantity input is typed into
+document.getElementById('product-quantity').addEventListener('input', updateOrderSummary);
+
 
             logMobileInfo();
             checkServiceWorkerIssues();
