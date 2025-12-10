@@ -1,0 +1,3783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q13 DYNAMIC - Premium Fireworks</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+/* Splash Screen Styles */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+}
+
+.splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.splash-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.splash-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 30px;
+    animation: logoPulse 2s infinite ease-in-out;
+}
+/* Add to your splash screen CSS section */
+body.splash-active {
+    overflow: hidden;
+    height: 100vh;
+}
+
+@keyframes logoPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.5));
+    }
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 25px rgba(249, 115, 22, 0.8));
+    }
+}
+
+.splash-powered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.splash-powered-text {
+    color: #f8fafc;
+}
+
+.vr-logo-splash {
+    height: 28px;
+    width: auto;
+}
+
+.splash-loading {
+    margin-top: 30px;
+    color: #f97316;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.loading-dots {
+    display: inline-flex;
+    gap: 5px;
+}
+
+.loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f97316;
+    animation: dotPulse 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes dotPulse {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* Fireworks Animation */
+.firework {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    /* REMOVE width and height - JavaScript will set them */
+}
+
+.firework-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    /* REMOVE width and height - JavaScript will set them */
+}
+
+/* Animation for fireworks particles */
+@keyframes explode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes shootUp {
+    0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(var(--top)) scale(1);
+        opacity: 1;
+    }
+}
+
+        :root {
+    --primary: #f97316;
+    --primary-light: #fb923c;
+    --primary-dark: #ea580c;
+    --secondary: #10b981;
+    --accent: #f59e0b;
+    --danger: #ef4444;
+    --light: #ffffff;
+    --light-gray: #f8fafc;
+    --gray: #e2e8f0;
+    --dark-gray: #64748b;
+    --dark: #1e293b;
+    --orange: #f97316;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--light);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-image {
+            height: 60px;
+            width: auto;
+        }
+
+.company-name {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+        .company-name .q13 {
+            color: var(--orange);
+        }
+
+        .company-name .dynamic {
+            color: var(--dark);
+        }
+        .company-name p {
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .company-name h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        /* Hero Section */
+        .hero {
+    padding: 60px 0 40px;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(135deg, #fff7ed 0%, #f8fafc 100%);
+    border-bottom: 1px solid var(--gray);
+    margin-bottom: 40px;
+}
+
+        .hero h2 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: var(--dark-gray);
+            font-weight: 400;
+        }
+
+        /* Filter Controls */
+        .filter-section {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--gray);
+        }
+
+        .filter-section h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-section h3 i {
+            color: var(--primary);
+        }
+
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .filter-select {
+            padding: 14px 16px;
+            background-color: var(--light);
+            border: 2px solid var(--gray);
+            color: var(--dark);
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-light);
+        }
+
+        .filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+        .filter-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .filter-btn {
+            padding: 14px 28px;
+            background-color: var(--light);
+            border: 2px solid var(--gray);
+            color: var(--dark);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-btn.active {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+}
+
+        .btn-reset {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-reset:hover {
+            background-color: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: linear-gradient(135deg, var(--light) 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0 40px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--gray);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 25px;
+            gap: 12px;
+        }
+
+        .view-btn {
+            padding: 12px 24px;
+            background: var(--light);
+            border: 2px solid var(--gray);
+            color: var(--dark);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Catalog Cards Grid */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .firework-card {
+            background: var(--light);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .firework-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--primary-light);
+        }
+
+        .card-header {
+    padding: 22px 22px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #fff7ed 0%, #f1f5f9 100%);
+    border-bottom: 1px solid var(--gray);
+}
+
+        .card-code {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .card-style {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .style-S {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .style-V {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+        .card-image-container {
+            height: 220px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background: #f1f5f9;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .firework-card:hover .card-image {
+            transform: scale(1.05);
+        }
+
+        .video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent; /* No background by default */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1; /* Always visible */
+    transition: background 0.3s ease, opacity 0.3s ease;
+    cursor: pointer;
+}
+
+
+        .card-image-container:hover .video-overlay {
+    background: rgba(30, 41, 59, 0.7); /* Show overlay on hover */
+}
+
+        .video-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
+    z-index: 2;
+}
+
+
+.card-image-container:hover .video-btn {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes attention-pulse {
+    0% {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+                    0 0 0 0 rgba(249, 115, 22, 0.3);
+        transform: scale(1);
+    }
+    70% {
+        box-shadow: 0 6px 25px rgba(249, 115, 22, 0.8),
+                    0 0 0 12px rgba(249, 115, 22, 0);
+        transform: scale(1.08);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+                    0 0 0 0 rgba(249, 115, 22, 0);
+        transform: scale(1);
+    }
+}
+
+.video-btn {
+    animation: attention-pulse 2s infinite;
+}
+
+/* Add a white border for better contrast */
+.video-btn {
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+
+
+        .shot-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 2px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-content {
+            padding: 22px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 18px;
+            line-height: 1.3;
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            padding: 14px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid var(--gray);
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .duration-value {
+            color: var(--accent);
+        }
+
+        .price-section {
+    background: linear-gradient(135deg, #fff7ed 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: auto;
+    border: 1px solid var(--gray);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+        .price-label {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .price-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* BUY BUTTON STYLES */
+        .buy-btn {
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .buy-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        /* Video Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 41, 59, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 1000px;
+            position: relative;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray);
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .video-player {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-player video {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--gray);
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            background: var(--light);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .footer-logo i {
+            color: var(--primary);
+        }
+
+        .safety-note {
+            max-width: 400px;
+            color: var(--dark-gray);
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .safety-note i {
+            color: var(--accent);
+            margin-right: 5px;
+        }
+
+        .copyright {
+            color: var(--dark-gray);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+            background: var(--light);
+            border-radius: 16px;
+            border: 2px dashed var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            color: var(--dark-gray);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+            background: var(--light);
+            border-radius: 16px;
+            border: 2px solid var(--gray);
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--gray);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ORDER MODAL STYLES */
+        .order-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 41, 59, 0.95);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .order-modal-content {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .order-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray);
+        }
+
+        .order-modal-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .close-order-modal {
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-order-modal:hover {
+            color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .order-details {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--gray);
+        }
+
+        .order-details h4 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+/* Add to existing order-details styles */
+.order-item .order-value[style*="color: var(--secondary)"] {
+    color: var(--secondary) !important;
+}
+
+        .order-label {
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        .order-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .total-price {
+            font-size: 1.4rem;
+            color: var(--primary);
+            font-weight: 800;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        .cod-charge-info {
+            background: #fff7ed;
+            border: 1px solid var(--primary-light);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+
+        .cod-charge-info strong {
+            color: var(--primary);
+        }
+
+
+        .order-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .submit-order-btn {
+            flex: 1;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-order-btn:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .submit-order-btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cancel-order-btn {
+            flex: 1;
+            padding: 16px;
+            background-color: var(--light);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-order-btn:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .catalog-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+                .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 15px;
+        text-align: left;
+    }
+
+.logo {
+        flex-direction: row;
+        align-items: center;
+    }
+.company-name h1 {
+        font-size: 1.5rem;
+    }
+    .company-name p {
+        font-size: 0.75rem;
+    }
+             
+            .company-name {
+                font-size: 1.8rem;
+                justify-content: center;
+            }
+            
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 25px;
+            }
+            
+            .catalog-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.3rem;
+            }
+            
+            .video-player video {
+                max-height: 60vh;
+            }
+            
+            .order-modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .order-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .catalog-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .company-name {
+                font-size: 1.6rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+            
+            .card-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .view-toggle {
+                justify-content: center;
+            }
+            
+            .order-modal-content {
+                padding: 15px;
+            }
+        }
+
+/* Collaboration Section Styles */
+.collaboration {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--dark-gray);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.venture-logo {
+    height: 30px;
+    width: auto;
+}
+
+/* Adjust header to accommodate collaboration */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Adjust footer content layout */
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+    .collaboration {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+        font-size:10px;
+    }
+    
+    
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 25px;
+    }
+    
+    .footer-content .collaboration {
+        order: 1;
+        margin-top: 0;
+    }
+}
+
+/* Add to your CSS */
+.collaboration a:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+}
+/* Add spinner animation */
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fa-spinner {
+    animation: fa-spin 2s infinite linear;
+}
+
+/* SPIN WHEEL STYLES */
+.wheel-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 41, 59, 0.95);
+    z-index: 1002;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.wheel-modal-content {
+    background: var(--light);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.wheel-title {
+    font-size: 1.8rem;
+    color: var(--dark);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.wheel-subtitle {
+    color: var(--dark-gray);
+    margin-bottom: 25px;
+    font-size: 1rem;
+}
+
+.wheel-wrapper {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 30px;
+}
+
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    transition: transform 4s cubic-bezier(0.17, 0.67, 0.22, 0.99);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border: 8px solid var(--primary);
+}
+
+.wheel-section {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    transform-origin: bottom right;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: 40%;
+    left: 1%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+    rotate: 270deg;
+}
+
+.wheel-pointer:before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 30px solid var(--primary);
+}
+
+.spin-btn {
+    padding: 16px 40px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto;
+}
+
+.spin-btn:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.spin-btn:disabled {
+    background-color: var(--gray);
+    cursor: not-allowed;
+}
+
+.wheel-result {
+    margin-top: 20px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    min-height: 30px;
+}
+
+.wheel-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--dark-gray);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.wheel-close:hover {
+    color: var(--danger);
+    background: #fef2f2;
+}
+
+.wheel-prize-list {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--gray);
+    text-align: left;
+}
+
+.wheel-prize-list h4 {
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin-bottom: 10px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.wheel-prize-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.wheel-prize-list li {
+    padding: 8px 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid var(--gray);
+    font-weight: 600;
+    color: var(--dark);
+    text-align: center;
+}
+/* Navigation Bar Styles */
+.navbar {
+    display: flex;
+    align-items: center;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+    background-color: rgba(249, 115, 22, 0.1);
+}
+
+.nav-link.active {
+    color: var(--primary);
+    background-color: rgba(249, 115, 22, 0.1);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--primary);
+}
+
+/* Hamburger Menu Styles (hidden by default) */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    z-index: 1000;
+}
+
+.bar {
+    height: 3px;
+    width: 100%;
+    background-color: var(--dark);
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+/* Mobile Responsive Styles for Navigation */
+@media (max-width: 768px) {
+    .navbar {
+        position: relative;
+    }
+    
+    .hamburger {
+        display: flex;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 250px;
+        height: 100vh;
+        background-color: var(--light);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+        transition: right 0.3s ease;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .nav-menu.active {
+        right: 0;
+    }
+    
+    .nav-link {
+        font-size: 1.2rem;
+        padding: 12px 24px;
+    }
+    
+    /* Animate hamburger to X when active */
+    .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .hamburger.active .bar:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+    }
+    
+    .hamburger.active .bar:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+    }
+    
+    /* Adjust header for mobile */
+    .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+    </style>
+</head>
+<body>
+<!-- Splash Screen -->
+<div class="splash-screen" id="splash-screen">
+    <div class="splash-content">
+        <img src="Q13LOGO.png" alt="Q13 DYNAMIC Logo" class="splash-logo">
+        <div class="splash-powered">
+            <span class="splash-powered-text">Powered by</span>
+            <span style="font-weight: 700; color: #f97316;">VentureRush</span>
+            <img src="ventureRush.png" alt="VentureRush" class="vr-logo-splash">
+        </div>
+        <div class="splash-loading">
+            Loading premium fireworks
+            <div class="loading-dots">
+                <span class="loading-dot"></span>
+                <span class="loading-dot"></span>
+                <span class="loading-dot"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Spin Wheel Modal -->
+<div class="wheel-container" id="wheel-container">
+    <div class="wheel-modal-content">
+        <button class="wheel-close" id="wheel-close">&times;</button>
+        <h3 class="wheel-title">🎁 Lucky Spin Wheel</h3>
+        <p class="wheel-subtitle">Spin to win a discount for your order!</p>
+        
+        <div class="wheel-prize-list">
+            <h4>Available Prizes:</h4>
+            <ul>
+                <li>Dis RM5</li>
+                <li>Dis RM7</li>
+                <li>Dis RM8</li>
+                <li>Dis RM10</li>
+                <li>Dis RM12</li>
+                <li>Dis RM15</li>
+            </ul>
+        </div>
+        
+        <div class="wheel-wrapper">
+            <div class="wheel" id="wheel">
+                <!-- Wheel sections will be generated by JavaScript -->
+            </div>
+            <div class="wheel-pointer"></div>
+        </div>
+        
+        <div class="wheel-result" id="wheel-result"></div>
+        
+        <button class="spin-btn" id="spin-btn">
+            <i class="fas fa-redo"></i> Spin The Wheel!
+        </button>
+    </div>
+</div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="Q13LOGO.png" alt="Q13 DYNAMIC Logo" class="logo-image">
+                    <div class="company-name">
+                        <h1>
+                        <span class="q13">Q13</span>&nbsp;<span class="dynamic">DYNAMIC</span>
+                        </h1>
+                        <p>The Art Of Explosive Beauty</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Bar -->
+                <nav class="navbar">
+                    <ul class="nav-menu">
+                        <li><a href="#" class="nav-link active" id="home-link">Home</a></li>
+                        <li><a href="#track-order" class="nav-link">Track Order</a></li>
+                        <li><a href="#agent" class="nav-link">Agent</a></li>
+                    </ul>
+                    <div class="hamburger" id="hamburger">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+                </nav>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Discover <span style="color: #f97316;">Q13 DYNAMIC</span> Fireworks</h2>
+            <p>Browse our complete collection of premium fireworks with real demonstration videos. Filter by specifications to find exactly what you need for your celebration.</p>
+<div class="collaboration" style="justify-content:center">
+    <span>in collaboration with </span>
+    <a href="https://venturerush-tech.netlify.app/" target="_blank" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+        <span style="font-weight: 600; color: #f97316;">VentureRush</span>
+        <img src="ventureRush.png" alt="VentureRush" class="venture-logo" style="margin-left: 8px;">
+    </a>
+</div>
+        </div>
+    </section>
+
+<!-- Track Order Section -->
+<section id="track-order" style="padding: 60px 0; background: #f8fafc; display: none;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 30px;">Track Your Order Status</h2>
+        
+        <div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: var(--card-shadow); padding: 40px;">
+            <div class="order-track-form" style="margin-bottom: 40px;">
+<i class="fas fa-shipping-fast" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+                <h3 style="margin-bottom: 20px; color: var(--dark);">Enter Your Order ID</h3>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="order-id-input" class="form-control" 
+                           placeholder="Enter your Order ID (e.g., sh12af18)" 
+                           style="flex: 1;">
+                    <button class="filter-btn" id="track-order-btn" style="background-color: var(--primary); color: white; white-space: nowrap;">
+                        <i class="fas fa-search"></i> Track Order
+                    </button>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: var(--dark-gray);">
+                    Your Order ID is the Bill URL sent to your email after purchase.<br>For example https://toyyibpay.com/sh12af18 the sh12af18 is the order id.
+                </p>
+            </div>
+
+            <!-- Progress Tracking Section -->
+            <div id="tracking-results" style="display: none;">
+                <h3 style="margin-bottom: 30px; color: var(--dark);">Order Progress</h3>
+                
+                <!-- Progress Bar -->
+                <div class="progress-container" style="margin-bottom: 40px;">
+                    <div class="progress-bar" style="height: 12px; background-color: var(--gray); border-radius: 6px; margin-bottom: 20px; position: relative;">
+                        <div class="progress-fill" id="progress-fill" style="height: 100%; background-color: var(--primary); border-radius: 6px; width: 0%; transition: width 0.5s ease;"></div>
+                        
+                        <!-- Progress Points -->
+                        <div class="progress-points" style="display: flex; justify-content: space-between; position: absolute; top: -25px; width: 100%;">
+                            <div class="progress-point" data-percent="0" style="text-align: center; position: relative;">
+                                <div class="point-circle" style="width: 20px; height: 20px; background-color: var(--gray); border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--dark-gray);">1</span>
+                            </div>
+                            <div class="progress-point" data-percent="25" style="text-align: center; position: relative;">
+                                <div class="point-circle" style="width: 20px; height: 20px; background-color: var(--gray); border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--dark-gray);">2</span>
+                            </div>
+                            <div class="progress-point" data-percent="45" style="text-align: center; position: relative;">
+                                <div class="point-circle" style="width: 20px; height: 20px; background-color: var(--gray); border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--dark-gray);">3</span>
+                            </div>
+                            <div class="progress-point" data-percent="65" style="text-align: center; position: relative;">
+                                <div class="point-circle" style="width: 20px; height: 20px; background-color: var(--gray); border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--dark-gray);">4</span>
+                            </div>
+                            <div class="progress-point" data-percent="80" style="text-align: center; position: relative;">
+                                <div class="point-circle" style="width: 20px; height: 20px; background-color: var(--gray); border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--dark-gray);">5</span>
+                            </div>
+                            <div class="progress-point" data-percent="100" style="text-align: center; position: relative;">
+                                <div class="point-circle" style="width: 20px; height: 20px; background-color: var(--gray); border-radius: 50%; margin: 0 auto 5px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--dark-gray);">Complete</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Details -->
+                <div id="order-details" style="background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid var(--gray);">
+                    <h4 style="margin-bottom: 15px; color: var(--dark);">Order Information :</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div>
+                            <span style="color: var(--dark-gray);">Order ID:</span>
+                            <p id="order-id-display" style="font-weight: 600; margin-top: 5px;">-</p>
+                        </div>
+                        <div>
+                            <span style="color: var(--dark-gray);">Status:</span>
+                            <p id="order-status-display" style="font-weight: 600; margin-top: 5px;">-</p>
+                        </div>
+                        <div>
+                            <span style="color: var(--dark-gray);">Payment Status:</span>
+                            <p id="payment-status-display" style="font-weight: 600; margin-top: 5px;">-</p>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <h4 style="margin-bottom: 15px; color: var(--dark);">Details :</h4>
+                            <span style="color: var(--dark-gray);">Customer Name:</span>
+                            <p id="customer-name-display" style="font-weight: 600; margin-top: 5px;">-</p>
+                            <span style="color: var(--dark-gray);">Product Code:</span>
+                            <p id="customer-productCode-display" style="font-weight: 600; margin-top: 5px;">-</p>                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading and Error States -->
+                <div id="tracking-loading" style="display: none; text-align: center; padding: 30px;">
+                    <div class="loading-spinner" style="border: 4px solid var(--gray); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+                    <p>Checking order status...</p>
+                </div>
+
+                <div id="tracking-error" style="display: none; text-align: center; padding: 30px; background: #fee; border-radius: 10px; border: 1px solid var(--danger);">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger); font-size: 2rem; margin-bottom: 15px;"></i>
+                    <h4 style="color: var(--danger); margin-bottom: 10px;">Order Not Found</h4>
+                    <p id="error-message">Invalid Order ID. Please check and try again.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="agent" style="padding: 60px 0; background: white; display: none;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 30px;">Become an Agent</h2>
+        <div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 16px; box-shadow: var(--card-shadow);">
+            <i class="fas fa-user-tie" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h3>Agent Program</h3>
+            <p>Interested in becoming a Q13 DYNAMIC agent? Contact us for partnership opportunities.</p>
+            <button class="filter-btn" style="margin-top: 20px; background-color: var(--primary); color: white;">
+                <i class="fas fa-envelope"></i> Contact for Details
+            </button>
+        </div>
+    </div>
+</section>
+
+    <!-- Filter Section -->
+    <div class="container">
+        <div class="filter-section">
+            <h3><i class="fas fa-sliders-h"></i> Filter Products</h3>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="shot-filter">Shot Count</label>
+                    <select id="shot-filter" class="filter-select">
+                        <option value="all">All Shot Counts</option>
+                        <option value="49">49 Shots</option>
+                        <option value="138">138 Shots</option>
+                        <option value="168">168 Shots</option>
+                        <option value="188">188 Shots</option>
+                        <option value="198">198 Shots</option>
+                        <option value="200+">200+ Shots</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="style-filter">Style</label>
+                    <select id="style-filter" class="filter-select">
+                        <option value="all">All Styles</option>
+                        <option value="S">Standard</option>
+                        <option value="V">V Shape</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="inch-filter">Size (Inch)</label>
+                    <select id="inch-filter" class="filter-select">
+                        <option value="all">All Sizes</option>
+                        <option value="4">4"</option>
+                        <option value="5">5"</option>
+                        <option value="6">6"</option>
+                        <option value="7">7"</option>
+                        <option value="8">8"</option>
+                        <option value="9">9"</option>
+                        <option value="10">10"</option>
+                        <option value="11">11"</option>
+                        <option value="12">12"</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="duration-filter">Duration</label>
+                    <select id="duration-filter" class="filter-select">
+                        <option value="all">All Durations</option>
+                        <option value="short">Short (< 1 min)</option>
+                        <option value="medium">Medium (1-2 min)</option>
+                        <option value="long">Long (> 2 min)</option>
+                    </select>
+                </div>
+
+<!-- Find the filter-controls section and add this filter-group -->
+<div class="filter-group">
+    <label for="price-filter">Price Range (RM)</label>
+    <select id="price-filter" class="filter-select">
+        <option value="all">All Prices</option>
+        <option value="<100">&lt; 100</option>
+        <option value="100-300">100 - 300</option>
+        <option value="300-500">300 - 500</option>
+        <option value="500-700">500 - 700</option>
+        <option value="700-900">700 - 900</option>
+        <option value="900>">900 ></option>
+    </select>
+</div>
+
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" id="apply-filters">
+                    <i class="fas fa-search"></i> Apply Filters
+                </button>
+                <button class="filter-btn btn-reset" id="reset-filters">
+                    <i class="fas fa-redo"></i> Reset All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="total-count">0</span>
+                <span class="stat-label">Total Products</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="avg-shot">0</span>
+                <span class="stat-label">Average Shots</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="avg-duration">00:00</span>
+                <span class="stat-label">Avg Duration</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="filtered-count">0</span>
+                <span class="stat-label">Currently Showing</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="container view-toggle">
+        <button class="view-btn active" id="grid-view">
+            <i class="fas fa-th-large"></i> Grid View
+        </button>
+        <button class="view-btn" id="list-view">
+            <i class="fas fa-list"></i> List View
+        </button>
+    </div>
+
+    <!-- Catalog Cards Grid -->
+    <section class="container">
+        <div class="catalog-grid" id="catalog-container">
+            <!-- Loading State -->
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <h3>Loading Fireworks Data...</h3>
+                <p>Fetching data from server...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Modal -->
+    <div class="video-modal" id="video-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Fireworks Video</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="video-player">
+                <video id="modal-video" controls>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div class="order-modal" id="order-modal">
+        <div class="order-modal-content">
+            <div class="order-modal-header">
+                <h3 class="order-modal-title">Order Fireworks</h3>
+                <button class="close-order-modal" id="close-order-modal">&times;</button>
+            </div>
+            
+            <div class="order-details">
+                <h4>Order Summary</h4>
+                <div class="order-item">
+                    <span class="order-label">Product:</span>
+                    <span class="order-value" id="order-product-name">-</span>
+                </div>
+                <div class="order-item">
+                    <span class="order-label">Product Price:</span>
+                    <span class="order-value" id="order-product-price">RM 0</span>
+                </div>
+                <div class="order-item">
+                    <span class="order-label">Admin Fee:</span>
+                    <span class="order-value" id="order-payment-fee">RM 1</span>
+                </div>
+                <div class="order-item total-price">
+                    <span class="order-label">Total Price:</span>
+                    <span class="order-value" id="order-total-price">RM 0</span>
+                </div>
+            </div>
+            
+            <div class="cod-charge-info">
+                <strong>C.O.D Charges (Cash on Delivery):</strong><br>
+                <strong>From : Nusantara,Gelang Patah</strong><br>
+                0 - 10KM = RM5<br>
+                10.1 - 20KM = RM10<br>
+                20.1 - 30KM = RM15<br>
+                30.1 - 40KM = RM20<br>
+                40.1 - 50KM = RM25<br>
+                > 50KM = Contact <strong>60198428621</strong>
+            </div>
+                        
+            <form id="order-form">
+                <div class="form-group">
+                    <label for="customer-name">Full Name *</label>
+                    <input type="text" id="customer-name" class="form-control" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer-phone">Phone Number *</label>
+                    <input type="tel" id="customer-phone" class="form-control" required placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer-email">Email Address *</label>
+                    <input type="email" id="customer-email" class="form-control" required placeholder="Enter your email address">
+                </div>
+                
+                <div class="form-group">
+                    <label for="delivery-address">Delivery Address *</label>
+                    <textarea id="delivery-address" class="form-control" rows="3" required placeholder="Enter complete delivery address including city, state and postcode"></textarea>  
+</div>
+
+<!-- Add this after the delivery address field -->
+<div class="form-group">
+    <label for="customer-note">Special Request / Note (Optional)</label>
+    <textarea id="customer-note" class="form-control" rows="3" placeholder="Any special instructions, requests, or notes for your order..."></textarea>
+</div>
+                
+                <div class="order-buttons">
+                    <button type="submit" class="submit-order-btn" id="submit-order-btn">
+                        <i class="fas fa-shopping-cart"></i> Proceed to Payment
+                    </button>
+                    <button type="button" class="cancel-order-btn" id="cancel-order-btn">Cancel Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="Q13LOGO.png" alt="Q13 DYNAMIC Logo" style="height: 30px; width: auto;">
+                    <span style="font-weight: 800;">
+                        <span style="color: #f97316;">Q13</span>&nbsp;<span style="color: #1e293b;">DYNAMIC</span>
+                    </span>
+                    <div class="collaboration">
+    <span>in collaboration with </span>
+    <a href="https://venturerush-tech.netlify.app/" target="_blank" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+        <span style="font-weight: 600; color: #f97316;">VentureRush</span>
+        <img src="ventureRush.png" alt="VentureRush" class="venture-logo" style="margin-left: 8px;">
+    </a>
+</div>
+                </div>
+                <div class="safety-note">
+                    <p><i class="fas fa-exclamation-triangle"></i> Always follow safety guidelines when handling fireworks. Keep a safe distance and have water nearby.</p>
+                </div>
+                <div class="copyright">
+                    <p>&copy; 2023 Q13 DYNAMIC. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Your Apps Script URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
+
+  const CUST_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
+       
+
+        // Global variables
+        let fireworksData = [];
+        let filteredData = [];
+        let currentOrderProduct = null;
+        
+        // DOM elements
+        const catalogContainer = document.getElementById("catalog-container");
+        const totalCountElement = document.getElementById("total-count");
+        const avgShotElement = document.getElementById("avg-shot");
+        const avgDurationElement = document.getElementById("avg-duration");
+        const filteredCountElement = document.getElementById("filtered-count");
+        const priceFilter = document.getElementById("price-filter");
+        
+        // Filter elements
+        const shotFilter = document.getElementById("shot-filter");
+        const styleFilter = document.getElementById("style-filter");
+        const inchFilter = document.getElementById("inch-filter");
+        const durationFilter = document.getElementById("duration-filter");
+        const applyFiltersBtn = document.getElementById("apply-filters");
+        const resetFiltersBtn = document.getElementById("reset-filters");
+        
+        // Modal elements
+        const videoModal = document.getElementById("video-modal");
+        const modalVideo = document.getElementById("modal-video");
+        const modalTitle = document.getElementById("modal-title");
+        const closeModalBtn = document.getElementById("close-modal");
+        
+        // Order modal elements
+        const orderModal = document.getElementById("order-modal");
+        const orderProductName = document.getElementById("order-product-name");
+        const orderProductPrice = document.getElementById("order-product-price");
+        const orderTotalPrice = document.getElementById("order-total-price");
+        const orderForm = document.getElementById("order-form");
+        const submitOrderBtn = document.getElementById("submit-order-btn");
+        const cancelOrderBtn = document.getElementById("cancel-order-btn");
+        const closeOrderModalBtn = document.getElementById("close-order-modal");
+      
+        
+        // View toggle elements
+        const gridViewBtn = document.getElementById("grid-view");
+        const listViewBtn = document.getElementById("list-view");
+
+// Navigation functionality
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.querySelector('.nav-menu');
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = {
+    home: document.querySelector('.hero'),
+    trackOrder: document.getElementById('track-order'),
+    agent: document.getElementById('agent'),
+    mainContent: document.querySelectorAll('.filter-section, .stats-bar, .view-toggle, #catalog-container')
+};
+
+// Initialize - hide all non-home sections on load
+function initializeSections() {
+    sections.trackOrder.style.display = 'none';
+    sections.agent.style.display = 'none';
+    // Show main content
+    showMainContent();
+}
+
+function showMainContent() {
+    sections.home.style.display = 'block';
+    sections.mainContent.forEach(el => {
+        if (el) el.style.display = '';
+    });
+}
+
+function hideMainContent() {
+    sections.home.style.display = 'none';
+    sections.mainContent.forEach(el => {
+        if (el) el.style.display = 'none';
+    });
+}
+
+// Show/hide sections based on navigation
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default anchor behavior
+        
+        // Update active state
+        navLinks.forEach(navLink => navLink.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Close mobile menu
+        closeMobileMenu();
+        
+        const href = link.getAttribute('href');
+        
+        // Handle different navigation links
+        if (href === '#') {
+            // Home - show main content, hide other sections
+            showMainContent();
+            sections.trackOrder.style.display = 'none';
+            sections.agent.style.display = 'none';
+            
+            // Smooth scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        } else if (href === '#track-order') {
+            // Track Order - hide main content, show track order
+            hideMainContent();
+            sections.trackOrder.style.display = 'block';
+            sections.agent.style.display = 'none';
+            
+            // After a brief delay to ensure DOM is updated, scroll smoothly
+            setTimeout(() => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 10);
+        } else if (href === '#agent') {
+            // Agent - hide main content, show agent
+            hideMainContent();
+            sections.trackOrder.style.display = 'none';
+            sections.agent.style.display = 'block';
+            
+            // After a brief delay to ensure DOM is updated, scroll smoothly
+            setTimeout(() => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 10);
+        }
+    });
+});
+
+// Toggle mobile menu
+function toggleMobileMenu() {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+    document.body.classList.toggle('menu-open');
+}
+
+// Close mobile menu
+function closeMobileMenu() {
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
+    document.body.classList.remove('menu-open');
+}
+
+// Event listeners for navigation
+hamburger.addEventListener('click', toggleMobileMenu);
+
+
+// Close menu on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+        closeMobileMenu();
+    }
+});
+
+// Close menu on window resize
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        closeMobileMenu();
+    }
+});
+
+// Add CSS for body when menu is open
+const style = document.createElement('style');
+style.textContent = `
+    body.menu-open {
+        overflow: hidden;
+    }
+`;
+document.head.appendChild(style);
+
+// SPIN WHEEL FUNCTIONALITY
+const wheelContainer = document.getElementById('wheel-container');
+const wheelElement = document.getElementById('wheel');
+const spinBtn = document.getElementById('spin-btn');
+const wheelResult = document.getElementById('wheel-result');
+const wheelCloseBtn = document.getElementById('wheel-close');
+const SPIN_WHEEL_PRIZE_KEY = 'spinWheelPrize';
+
+// Wheel prizes
+const wheelPrizes = [
+    { name: 'RM15<-----', value: 15 },
+    { name: 'RM12<-----', value: 12 },
+    { name: 'RM10<-----', value: 10 },
+    { name: 'RM8<-----', value: 8 },
+    { name: 'RM7<-----', value: 7 },
+    { name: 'RM5<-----', value: 5 }
+];
+
+// Colors for wheel sections
+const wheelColors = [
+    '#A52A2A', '#fb923c', '#f59e0b', 
+    '#10b981', '#3b82f6', '#8b5cf6'
+];
+
+// Initialize wheel
+function initializeWheel() {
+    wheelElement.innerHTML = '';
+    const anglePerSection = 360 / wheelPrizes.length;
+    
+    wheelPrizes.forEach((prize, index) => {
+        const section = document.createElement('div');
+        section.className = 'wheel-section';
+        section.style.backgroundColor = wheelColors[index];
+        section.style.transform = `rotate(${index * anglePerSection}deg)`;
+        
+        const text = document.createElement('div');
+        text.textContent = prize.name;
+        text.style.transform = `rotate(${anglePerSection / 2}deg) translate(30px)`;
+        text.style.textAlign = 'center';
+        text.style.fontSize = '14px';
+        text.style.width = '100px';
+        
+        section.appendChild(text);
+        wheelElement.appendChild(section);
+    });
+}
+
+// Check if user can spin wheel
+function canSpinWheel() {
+    const lastSpin = localStorage.getItem('lastSpinDate');
+    const savedPrize = localStorage.getItem(SPIN_WHEEL_PRIZE_KEY);
+    
+    // If user has a saved prize, they can't spin again
+    if (savedPrize) {
+        return false;
+    }
+    
+    // If no last spin date, they can spin
+    if (!lastSpin) {
+        return true;
+    }
+    
+    // Check if 24 hours have passed since last spin
+    const lastSpinDate = new Date(lastSpin);
+    const now = new Date();
+    const diffHours = (now - lastSpinDate) / (1000 * 60 * 60);
+    
+    // Allow spinning if 24 hours have passed OR if user just submitted an order
+    // (meaning the prize was cleared)
+    return diffHours >= 24;
+}
+
+// Show spin wheel if eligible
+function checkAndShowSpinWheel(productPrice) {
+    if (productPrice >= 500 && canSpinWheel()) {
+        setTimeout(() => {
+            openWheelModal();
+        }, 500); // Small delay after opening order modal
+    }
+}
+
+// Open wheel modal
+function openWheelModal() {
+    wheelResult.textContent = '';
+    spinBtn.disabled = false;
+    spinBtn.innerHTML = '<i class="fas fa-redo"></i> Spin The Wheel!';
+    wheelContainer.style.display = 'flex';
+    initializeWheel();
+}
+
+// Close wheel modal
+function closeWheelModal() {
+    wheelContainer.style.display = 'none';
+}
+
+// Spin the wheel
+function spinWheel() {
+    spinBtn.disabled = true;
+    spinBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Spinning...';
+    wheelResult.textContent = '';
+    
+    // Random rotation (multiple full rotations + random prize)
+    const rotations = 5; // Number of full rotations
+    const randomPrizeIndex = Math.floor(Math.random() * wheelPrizes.length);
+    const anglePerSection = 360 / wheelPrizes.length;
+    
+    // Calculate final angle (pointing to the selected prize at the top)
+    // The pointer is at 90 degrees (top), so we need to calculate accordingly
+    const targetAngle = 360 * rotations + (360 - (randomPrizeIndex * anglePerSection + anglePerSection / 2));
+    
+    // Apply rotation
+    wheelElement.style.transform = `rotate(${targetAngle}deg)`;
+    
+    // Wait for animation to complete
+    setTimeout(() => {
+        const prize = wheelPrizes[randomPrizeIndex];
+        wheelResult.textContent = `🎉 Congratulations! You won: RM${prize.value}`;
+        
+        // Save prize to localStorage
+        localStorage.setItem(SPIN_WHEEL_PRIZE_KEY, prize.value.toString());
+        localStorage.setItem('lastSpinDate', new Date().toISOString());
+        
+        spinBtn.innerHTML = '<i class="fas fa-check"></i> Prize Saved!';
+        
+        // Update order summary if order modal is open
+        updateOrderSummary();
+        
+    }, 4000); // Match CSS transition duration
+}
+
+// Get current discount from localStorage
+function getCurrentDiscount() {
+    const savedPrize = localStorage.getItem(SPIN_WHEEL_PRIZE_KEY);
+    return savedPrize ? parseInt(savedPrize) : 0;
+}
+
+// Clear spin wheel prize (call this after order submission)
+function clearSpinWheelPrize() {
+    localStorage.removeItem(SPIN_WHEEL_PRIZE_KEY);
+    // Also remove the last spin date so user can spin again immediately for next order
+    localStorage.removeItem('lastSpinDate');
+}
+
+     
+
+// Fireworks animation for splash screen - ENHANCED VERSION
+function createFireworksAnimation() {
+    const splashScreen = document.getElementById('splash-screen');
+    const colors = ['#f97316', '#fb923c', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899'];
+    
+    // Create initial burst of fireworks
+    for (let i = 0; i < 12; i++) { // Increased from 8 to 12
+        setTimeout(() => {
+            createFirework(i);
+        }, i * 400); // Reduced delay from 800ms to 400ms for more fireworks
+    }
+    
+    function createFirework(index) {
+        // Create main firework that shoots up
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        firework.style.left = `${10 + (Math.random() * 80)}%`; // Wider range (10-90%)
+        firework.style.setProperty('--top', `-${Math.random() * 150 + 50}px`); // More height variation
+        
+        // Random size for variety
+        const size = 8 + Math.random() * 12;
+        firework.style.width = `${size}px`;
+        firework.style.height = `${size}px`;
+        
+        splashScreen.appendChild(firework);
+        
+        // Animate shooting up with random speed
+        const speed = 800 + Math.random() * 700; // 800-1500ms
+        firework.animate([
+            { transform: 'translateY(100vh) scale(0.3)', opacity: 0 },
+            { transform: 'translateY(calc(var(--top) * 1)) scale(1)', opacity: 1 }
+        ], {
+            duration: speed,
+            easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)'
+        });
+        
+        // Explode after reaching top
+        setTimeout(() => {
+            explodeFirework(firework);
+        }, speed);
+    }
+    
+    function explodeFirework(firework) {
+        const color = firework.style.backgroundColor;
+        const rect = firework.getBoundingClientRect();
+        const particles = 20 + Math.floor(Math.random() * 12); // 20-32 particles
+        
+        // Remove the main firework
+        firework.remove();
+        
+        // Create explosion particles
+        for (let i = 0; i < particles; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'firework-particle';
+            particle.style.backgroundColor = color;
+            particle.style.left = `${rect.left}px`;
+            particle.style.top = `${rect.top}px`;
+            
+            // Random particle size
+            const particleSize = 5 + Math.random() * 8;
+            particle.style.width = `${particleSize}px`;
+            particle.style.height = `${particleSize}px`;
+            
+            const angle = (Math.PI * 2 * i) / particles;
+            const distance = 80 + Math.random() * 200; // 40-160px
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            splashScreen.appendChild(particle);
+            
+            // Animate explosion with random duration
+            const explosionDuration = 800 + Math.random() * 800; // 800-1600ms
+            
+            particle.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: 'translate(var(--tx), var(--ty)) scale(0)', opacity: 0 }
+            ], {
+                duration: explosionDuration,
+                easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                fill: 'forwards'
+            });
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.remove();
+                }
+            }, explosionDuration);
+        }
+    }
+    
+    // Continue fireworks until splash screen is hidden - MORE FREQUENT
+    const continueFireworks = setInterval(() => {
+        if (splashScreen.classList.contains('fade-out')) {
+            clearInterval(continueFireworks);
+            return;
+        }
+        // Create multiple fireworks at once
+        for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) { // 2-4 fireworks
+            setTimeout(() => {
+                createFirework(Math.random());
+            }, i * 200);
+        }
+    }, 800); // Reduced from 1500ms to 800ms for more frequent fireworks
+}
+
+// Detect if mobile
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+// If mobile, add specific optimizations
+if (isMobile) {
+    console.log('Mobile device detected, applying optimizations...');
+    
+    // Add mobile-specific meta tags dynamically
+    const meta = document.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    document.head.appendChild(meta);
+}
+
+// Add this function near the top of your JavaScript
+function logMobileInfo() {
+    console.log('Browser Info:', navigator.userAgent);
+    console.log('Platform:', navigator.platform);
+    console.log('Online status:', navigator.onLine);
+    console.log('Screen size:', window.innerWidth, 'x', window.innerHeight);
+}
+
+let retryCount = 0;
+const MAX_RETRIES = 3;
+
+
+function loadDataWithRetry() {
+    // Check network first
+    if (!checkNetworkStatus()) {
+        return;
+    }
+    
+    // Show loading state
+    catalogContainer.innerHTML = `
+        <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <h3>Loading Fireworks Data...</h3>
+            <p>${retryCount > 0 ? `Retry attempt ${retryCount}/${MAX_RETRIES}...` : 'Fetching data from server...'}</p>
+        </div>
+    `;
+    
+    // Fetch data from Google Sheets using JSONP
+    fetchDataFromGoogleSheets(handleDataWithRetry);
+}
+
+function handleDataWithRetry(response) {
+    if (response && response.success) {
+        handleData(response);
+    } else {
+        retryCount++;
+        if (retryCount <= MAX_RETRIES) {
+            // Wait 2 seconds then retry
+            setTimeout(loadDataWithRetry, 2000);
+        } else {
+            showErrorWithRetry(response?.message || 'Failed to load data. Please try again later.');
+        }
+    }
+}
+
+function showErrorWithRetry(message) {
+    // Hide splash screen
+    const splashScreen = document.getElementById('splash-screen');
+    if (splashScreen) {
+        splashScreen.classList.add('fade-out');
+    }
+
+    // Remove splash-active class
+    document.body.classList.remove('splash-active');
+    
+    catalogContainer.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Data</h3>
+            <p>${message}</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="filter-btn" onclick="initializePage()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+                <button class="filter-btn" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> Reload Page
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Check for Service Worker issues
+function checkServiceWorkerIssues() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            if (registrations.length > 0) {
+                console.log('Service Workers detected, they might interfere with JSONP');
+                // Optionally unregister problematic service workers
+                // registrations.forEach(function(registration) {
+                //     registration.unregister();
+                // });
+            }
+        });
+    }
+}
+
+        // Fetch data from Google Apps Script using JSONP
+function fetchDataFromGoogleSheets(callback) {
+    // Create a unique callback name
+    const callbackName = 'callback_' + new Date().getTime();
+    
+    // Create script element for JSONP
+    const script = document.createElement('script');
+    
+    // Add error handling attributes
+    script.crossOrigin = 'anonymous';
+    script.referrerPolicy = 'no-referrer';
+    
+    // Add timeout handling for mobile
+    const timeoutId = setTimeout(() => {
+        if (window[callbackName]) {
+            document.head.removeChild(script);
+            delete window[callbackName];
+        }
+        callback({
+            success: false,
+            message: 'Request timeout on mobile device'
+        });
+    }, 15000); // 15 second timeout for mobile
+    
+    script.src = `${APPS_SCRIPT_URL}?format=jsonp&callback=${callbackName}&t=${new Date().getTime()}&mobile=${isMobile ? 'yes' : 'no'}&v=1.0`;
+    
+    // Define the callback function
+    window[callbackName] = function(response) {
+        // Clean up
+        clearTimeout(timeoutId);
+        document.head.removeChild(script);
+        delete window[callbackName];
+        
+        callback(response);
+    };
+    
+    // Handle JSONP errors
+    script.onerror = function() {
+        clearTimeout(timeoutId);
+        if (document.head.contains(script)) {
+            document.head.removeChild(script);
+        }
+        delete window[callbackName];
+        
+        callback({
+            success: false,
+            message: 'Network error on mobile device. Please check connection.'
+        });
+    };
+    
+    // Add script to page
+    document.head.appendChild(script);
+}
+
+// Check network connectivity
+function checkNetworkStatus() {
+    if (!navigator.onLine) {
+        showError('No internet connection. Please check your network and try again.');
+        return false;
+    }
+    return true;
+}
+
+        // Calculate stats
+        function calculateStats(data) {
+            if (!data || data.length === 0) {
+                totalCountElement.textContent = '0';
+                avgShotElement.textContent = '0';
+                avgDurationElement.textContent = '00:00';
+                filteredCountElement.textContent = '0';
+                return;
+            }
+            
+            const total = fireworksData.length;
+            
+            // Calculate average shots
+            const totalShots = fireworksData.reduce((sum, item) => sum + (item.shot || 0), 0);
+            const avgShots = Math.round(totalShots / total);
+            
+            // Calculate average duration in seconds
+            const totalSeconds = fireworksData.reduce((sum, item) => {
+                return sum + convertDurationToSeconds(item.duration || '0');
+            }, 0);
+            
+            const avgSeconds = Math.round(totalSeconds / total);
+            const avgMinutes = Math.floor(avgSeconds / 60);
+            const avgRemainingSeconds = avgSeconds % 60;
+            const avgDuration = avgMinutes > 0 
+                ? `${avgMinutes}:${avgRemainingSeconds.toString().padStart(2, '0')}`
+                : avgSeconds.toString();
+            
+            // Update stats
+            totalCountElement.textContent = total;
+            avgShotElement.textContent = avgShots;
+            avgDurationElement.textContent = avgDuration;
+            filteredCountElement.textContent = data.length;
+        }
+
+// Convert duration string to seconds - handles ISO date strings, time strings, and numbers
+function convertDurationToSeconds(duration) {
+    if (!duration) return 0;
+    
+    // Handle ISO date strings like "1899-12-29T17:56:35.000Z"
+    if (typeof duration === 'string' && duration.includes('T') && duration.includes('Z')) {
+        try {
+            const date = new Date(duration);
+            // Get minutes and seconds from the date
+            const minutes = date.getUTCMinutes();
+            const seconds = date.getUTCSeconds();
+            // Calculate total seconds (ignore hours since they represent days in Google Sheets time)
+            return (minutes * 60) + seconds;
+        } catch (e) {
+            console.error('Error parsing duration:', e);
+            return 0;
+        }
+    }
+    
+    // Check if duration is already in seconds (just a number)
+    if (!isNaN(duration) && duration.toString().indexOf(':') === -1) {
+        return parseInt(duration);
+    }
+    
+    // Handle MM:SS or HH:MM:SS format
+    if (duration.includes(":")) {
+        const parts = duration.split(":");
+        if (parts.length === 2) {
+            const [min, sec] = parts.map(Number);
+            return (min * 60) + sec;
+        } else if (parts.length === 3) {
+            const [hour, min, sec] = parts.map(Number);
+            // Convert hours to minutes and add to minutes
+            const totalMinutes = (hour * 60) + min;
+            return (totalMinutes * 60) + sec;
+        }
+    }
+    
+    // Try to parse as number
+    const num = parseInt(duration);
+    return isNaN(num) ? 0 : num;
+}
+
+// Format duration for display - handles ISO date strings, time strings, and numbers
+function formatDuration(duration) {
+    if (!duration) return "0s";
+    
+    // If it's an ISO date string
+    if (typeof duration === 'string' && duration.includes('T') && duration.includes('Z')) {
+        try {
+            const date = new Date(duration);
+            // Get minutes and seconds ONLY, ignoring the "day" part
+            const minutes = date.getUTCMinutes();
+            const seconds = date.getUTCSeconds();
+            
+            // Show MM:SS format
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        } catch (e) {
+            return "0s";
+        }
+    }
+    
+    // If it's just a number, assume seconds
+    if (!isNaN(duration) && duration.toString().indexOf(':') === -1) {
+        const seconds = parseInt(duration);
+        if (seconds < 60) {
+            return `${seconds}s`;
+        } else {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+    }
+    
+    // If it's already in MM:SS or HH:MM:SS format
+    if (duration.includes(":")) {
+        const parts = duration.split(":");
+        if (parts.length === 2) {
+            const [min, sec] = parts;
+            return `${min}:${sec.padStart(2, '0')}`;
+        } else if (parts.length === 3) {
+            const [hour, min, sec] = parts;
+            // If you want to ignore hours and show just minutes:seconds
+            // Convert hours to minutes and add to minutes
+            const totalMinutes = (parseInt(hour) * 60) + parseInt(min);
+            return `${totalMinutes}:${sec.padStart(2, '0')}`;
+        }
+    }
+    
+    return `${duration}s`;
+}
+
+        // Create catalog card for a firework
+        function createFireworkCard(item) {
+            const card = document.createElement("div");
+            card.className = "firework-card";
+            card.dataset.shot = item.shot || 0;
+            card.dataset.style = item.style || '';
+            
+            const durationDisplay = formatDuration(item.duration);
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-code">${item.code || 'N/A'}</div>
+                    <div class="card-style style-${item.style || ''}">${item.style || 'N/A'} Style</div>
+                </div>
+                <div class="card-image-container">
+                    <img src="${item.image || ''}" alt="${item.name || 'Firework'}" class="card-image" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                    <div class="shot-badge">${item.shot || 0} Shots</div>
+                    ${item.video ? `
+                    <div class="video-overlay" data-video="${item.video}" data-name="${item.name}">
+                        <button class="video-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="card-content">
+                    <h3 class="card-name">${item.name || 'Unnamed Firework'}</h3>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Size</span>
+                            <span class="detail-value">${item.inch || 0}"</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Duration</span>
+                            <span class="detail-value duration-value">${durationDisplay}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Shot Count</span>
+                            <span class="detail-value">${item.shot || 0}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Style</span>
+                            <span class="detail-value">${item.style || 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="price-section">
+                        <div class="price-label">Price (RM)</div>
+                        <div class="price-value">${item.price || 0}</div>
+                        <button class="buy-btn" data-product='${JSON.stringify(item)}'>
+                            <i class="fas fa-shopping-cart"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add click event to video button if video exists
+            const videoBtn = card.querySelector('.video-overlay');
+            if (videoBtn) {
+                videoBtn.addEventListener('click', () => {
+                    openVideoModal(item.video, `${item.code || ''} - ${item.name || ''}`);
+                });
+            }
+            
+            // Add click event to buy button
+            const buyBtn = card.querySelector('.buy-btn');
+            if (buyBtn) {
+                buyBtn.addEventListener('click', () => {
+                    const productData = JSON.parse(buyBtn.getAttribute('data-product'));
+                    openOrderModal(productData);
+                });
+            }
+            
+            return card;
+        }
+
+        // Filter fireworks based on selected filters
+        function filterFireworks() {
+            const shotValue = shotFilter.value;
+            const styleValue = styleFilter.value;
+            const inchValue = inchFilter.value;
+            const durationValue = durationFilter.value;
+            const priceValue = priceFilter.value; 
+            
+            return fireworksData.filter(item => {
+                // Filter by shot count
+                if (shotValue !== "all") {
+                    if (shotValue === "200+") {
+                        if (item.shot < 200) return false;
+                    } else {
+                        if (item.shot !== parseInt(shotValue)) return false;
+                    }
+                }
+                
+                // Filter by style
+                if (styleValue !== "all" && item.style !== styleValue) return false;
+                
+                // Filter by inch size
+                if (inchValue !== "all" && item.inch !== parseInt(inchValue)) return false;
+                
+                // Filter by duration
+                if (durationValue !== "all") {
+                    const durationSeconds = convertDurationToSeconds(item.duration);
+                    
+                    // Apply duration filter
+                    if (durationValue === "short" && durationSeconds >= 60) return false;
+                    if (durationValue === "medium" && (durationSeconds < 60 || durationSeconds > 120)) return false;
+                    if (durationValue === "long" && durationSeconds <= 120) return false;
+                }
+
+// NEW: Filter by price range
+        if (priceValue !== "all") {
+            const price = item.price || 0;
+            
+            switch(priceValue) {
+                case "<100":
+                    if (price >= 100) return false;
+                    break;
+                case "100-300":
+                    if (price < 100 || price > 300) return false;
+                    break;
+                case "300-500":
+                    if (price < 300 || price > 500) return false;
+                    break;
+                case "500-700":
+                    if (price < 500 || price > 700) return false;
+                    break;
+                case "700-900":
+                    if (price < 700 || price > 900) return false;
+                    break;
+                case "900>":
+                    if (price < 900) return false;
+                    break;
+            }
+                }
+                return true;
+            });
+        }
+
+        // Populate catalog with cards
+        function populateCatalog(data) {
+            catalogContainer.innerHTML = "";
+            
+            if (!data || data.length === 0) {
+                catalogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No Fireworks Found</h3>
+                        <p>Try adjusting your filters to see more products.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            data.forEach(item => {
+                const card = createFireworkCard(item);
+                catalogContainer.appendChild(card);
+            });
+        }
+
+        // Open video modal
+        function openVideoModal(videoUrl, title) {
+            if (!videoUrl) {
+                alert('No video available for this product');
+                return;
+            }
+            
+            modalVideo.src = videoUrl;
+            modalTitle.textContent = title;
+            videoModal.style.display = "flex";
+            modalVideo.play();
+        }
+
+        // Close video modal
+        function closeVideoModal() {
+            modalVideo.pause();
+            modalVideo.src = "";
+            videoModal.style.display = "none";
+        }
+
+// MODIFY the openOrderModal function to check for spin wheel eligibility
+function openOrderModal(product) {
+    currentOrderProduct = product;
+    
+    // Update order details
+    orderProductName.textContent = `${product.code} - ${product.name}`;
+    
+    // Reset form
+    orderForm.reset();
+    submitOrderBtn.disabled = false;
+    
+    // Calculate total price with discount
+    updateOrderSummary();
+    
+    // Show modal
+    orderModal.style.display = "flex";
+    
+    // Check if user can spin wheel (product price >= RM500)
+    if (product.price >= 500) {
+        checkAndShowSpinWheel(product.price);
+    }
+}
+
+        // Close order modal
+        function closeOrderModal() {
+            orderModal.style.display = "none";
+            currentOrderProduct = null;
+        }
+     
+
+        // Calculate total price
+function calculateTotalPrice() {
+    if (!currentOrderProduct) return 0;
+    const productPrice = currentOrderProduct.price || 0;
+    const paymentFee = 1;
+    return productPrice + paymentFee;
+}
+
+// Update the updateOrderSummary function to include discount
+function updateOrderSummary() {
+    if (!currentOrderProduct) return;
+    
+    const productPrice = currentOrderProduct.price || 0;
+    const paymentFee = 1;
+    
+    // Check if product is eligible for discount (≥ RM500)
+    const isEligibleForDiscount = productPrice >= 500;
+    
+    // Only apply discount if product is eligible AND user has a saved prize
+    const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
+    const totalPrice = productPrice + paymentFee - discount;
+    
+    // Update order summary display
+    orderProductPrice.textContent = `RM ${productPrice.toFixed(2)}`;
+    orderTotalPrice.textContent = `RM ${totalPrice.toFixed(2)}`;
+    
+    // Add discount line to order summary
+    let discountElement = document.getElementById('order-discount');
+    
+    // If product is not eligible for discount, remove discount line if it exists
+    if (!isEligibleForDiscount) {
+        if (discountElement) {
+            discountElement.remove();
+        }
+        return; // Don't show discount for products below RM500
+    }
+    
+    // Only show discount line for eligible products
+    if (!discountElement) {
+        discountElement = document.createElement('div');
+        discountElement.className = 'order-item';
+        discountElement.id = 'order-discount';
+        
+        const discountLabel = document.createElement('span');
+        discountLabel.className = 'order-label';
+        discountLabel.textContent = 'Discount:';
+        
+        const discountValue = document.createElement('span');
+        discountValue.className = 'order-value';
+        discountValue.id = 'order-discount-value';
+        
+        discountElement.appendChild(discountLabel);
+        discountElement.appendChild(discountValue);
+        
+        // Insert before total price
+        const orderDetails = document.querySelector('.order-details');
+        const totalItem = orderDetails.querySelector('.total-price');
+        orderDetails.insertBefore(discountElement, totalItem);
+    }
+    
+    const discountValueElement = document.getElementById('order-discount-value');
+    if (discount > 0) {
+        discountValueElement.textContent = `-RM ${discount.toFixed(2)}`;
+        discountValueElement.style.color = 'var(--secondary)';
+        discountValueElement.style.fontWeight = '700';
+    } else {
+        discountValueElement.textContent = 'RM 0';
+        discountValueElement.style.color = 'var(--dark-gray)';
+    }
+}
+
+function generateToyyibPayLink(orderData) {
+    // ==============================
+    // TOYYIBPAY CREDENTIALS - UPDATE THESE!
+    // ==============================
+    const TOYYIBPAY_CATEGORY_CODE = '7vc5uxm8'; // Replace with your actual category code
+    const TOYYIBPAY_SECRET_KEY = 'xgyiyiwb-ij8m-48ll-p1g6-24sqtt00kpwl'; // Replace with your actual secret key
+    
+    // Calculate amount in cents (RM to sen)
+    const amountInSen = Math.round(orderData.totalPrice * 100);
+    
+    // Create unique reference number
+    const refNo = `${orderData.customerPhone}`;
+
+ // Calculate expiration time (5 minutes from now)
+ const nowUtc = new Date();
+  const expiryMyTime = new Date(nowUtc.getTime() + (5 + 480) * 60 * 1000);
+  const formattedExpiry = expiryMyTime.toISOString().split('.')[0].replace('T', ' ');
+    
+    // ==============================
+    // TOYYIBPAY API ENDPOINT
+    // ==============================
+    const TOYYIBPAY_API_URL = 'https://toyyibpay.com/index.php/api/createBill';
+    
+    // ==============================
+    // CREATE FORM DATA FOR API CALL
+    // ==============================
+    const formData = new FormData();
+    formData.append('userSecretKey', TOYYIBPAY_SECRET_KEY);
+    formData.append('categoryCode', TOYYIBPAY_CATEGORY_CODE);
+    formData.append('billName', `Q13 DYNAMIC - ${orderData.productCode}`);
+    formData.append('billDescription', `Purchase: ${orderData.productCode} ${orderData.productName}`);
+    formData.append('billPriceSetting', '1');
+    formData.append('billPayorInfo', '1');
+    formData.append('billAmount', amountInSen.toString());
+    formData.append('billReturnUrl', 'https://q13dynamic-vr.com/pay.html');
+    formData.append('billCallbackUrl', 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec');
+    formData.append('billExternalReferenceNo', refNo);
+    formData.append('billTo', orderData.customerName);
+    formData.append('billEmail', orderData.customerEmail);
+    formData.append('billPhone', orderData.customerPhone);
+    formData.append('billSplitPayment', '0');
+    formData.append('billSplitPaymentArgs', '');
+    formData.append('billPaymentChannel', '0');
+    formData.append('billContentEmail', 'Thank you for your purchase from Q13 DYNAMIC! Your fireworks order is being processed.');
+    formData.append('billChargeToCustomer', '1');
+    formData.append("billExpiryDate", formattedExpiry);
+    
+    // ==============================
+    // MAKE API CALL TO TOYYIBPAY
+    // ==============================
+    return new Promise((resolve, reject) => {
+        fetch(TOYYIBPAY_API_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'cors'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data[0] && data[0].BillCode) {
+                // Success! Redirect to payment page
+                const paymentUrl = `https://toyyibpay.com/${data[0].BillCode}`;
+                resolve(paymentUrl);
+            } else {
+                // API returned error
+                console.error('ToyyibPay API Error:', data);
+                reject(new Error('Failed to create payment bill. Please try again.'));
+            }
+        })
+        .catch(error => {
+            console.error('ToyyibPay API Call Failed:', error);
+            reject(new Error('Payment gateway connection failed. Please try again.'));
+        });
+    });
+}
+
+// MODIFY the handleOrderSubmit function to clear wheel prize after submission
+async function handleOrderSubmit(event) {
+    event.preventDefault();
+    
+    if (!currentOrderProduct) {
+        alert('Product information is missing. Please try again.');
+        return;
+    }
+    
+    // Get form data
+    const customerName = document.getElementById('customer-name').value;
+    const customerPhone = document.getElementById('customer-phone').value;
+    const customerEmail = document.getElementById('customer-email').value;
+    const deliveryAddress = document.getElementById('delivery-address').value;
+    const customerNote = document.getElementById('customer-note').value;
+    
+    // Validate form data
+    if (!customerName || !customerPhone || !customerEmail || !deliveryAddress) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+        // Validate phone number - must start with 6 (no starting with 0)
+    // Remove all spaces, dashes, and plus signs
+    const cleanedPhone = customerPhone.replace(/\s+|-|\+/g, '');
+
+// Check if phone has symbol
+if (/[+\-()]/.test(customerPhone)) {
+    alert('Phone number cannot contain symbols like +, -, (, ).\n\nPlease use only numbers (e.g., 601160801477).');
+    return;
+}
+
+// Check if phone has spaces
+if (customerPhone.includes(' ')) {
+    alert('Phone number cannot contain spaces.\n\nPlease remove spaces (e.g., 601160801477 instead of 6011 6080 1477).');
+    return;
+}
+    
+    // Check if phone starts with 0
+    if (cleanedPhone.startsWith('0')) {
+        alert('Phone number should start with "6" (e.g., 60123456789), not with "0".\n\nPlease remove the leading 0 and start with 6.');
+        return;
+    }
+    
+    // Check if phone starts with 6 and has valid length (10-11 digits for Malaysian numbers)
+    if (!cleanedPhone.startsWith('6')) {
+        alert('Phone number should start with "6" (e.g., 60123456789).\n\nPlease enter a valid Malaysian phone number starting with 6.');
+        return;
+    }
+    
+    // Check total length (should be 10-11 digits for Malaysian numbers: 601X-XXX-XXXX or 601XX-XXX-XXXX)
+    if (cleanedPhone.length < 10 || cleanedPhone.length > 15) {
+        alert('Phone number should be 10-11 digits starting with "6" (e.g., 60123456789).\n\nPlease enter a valid Malaysian phone number.');
+        return;
+    }
+    
+    // Check if all characters are numbers
+    if (!/^\d+$/.test(cleanedPhone)) {
+        alert('Phone number should contain only numbers.\n\nPlease enter a valid Malaysian phone number (e.g., 60123456789).');
+        return;
+    }
+    
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerEmail)) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+    
+    // Disable submit button while processing
+    submitOrderBtn.disabled = true;
+    submitOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    // Get discount - only if product is eligible (≥ RM500)
+    const isEligibleForDiscount = currentOrderProduct.price >= 500;
+    const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
+    const totalPrice = calculateTotalPrice() - discount;
+    
+    // Create order data object
+    const orderData = {
+        timestamp: new Date().toISOString(),
+        productCode: currentOrderProduct.code,
+        productName: currentOrderProduct.name,
+        productPrice: currentOrderProduct.price,
+        discount: discount, // Add discount to order data
+        customerName: customerName,
+        customerPhone: customerPhone,
+        customerEmail: customerEmail,
+        deliveryAddress: deliveryAddress,
+        spinPrize: discount,
+        customerNote: customerNote,
+        paymentFee: 1,
+        totalPrice: totalPrice
+    };
+    
+    try {
+        // Send order data to Google Sheets
+        const sheetResponse = await sendOrderToGoogleSheets(orderData);
+        
+        if (sheetResponse && sheetResponse.success) {
+            // Clear spin wheel prize after successful order
+            // This allows the user to spin again for their NEXT order
+            clearSpinWheelPrize();
+            
+            // Generate REAL ToyyibPay payment link
+            const paymentLink = await generateToyyibPayLink(orderData);
+            
+            // Show confirmation message with discount info
+            let message = `Order submitted successfully!\n\n`;
+            message += `Product Price: RM ${currentOrderProduct.price.toFixed(2)}\n`;
+            message += `Admin Fee: RM 1\n`;
+            if (discount > 0) {
+                message += `Discount: -RM ${discount.toFixed(2)}\n`;
+            }
+            message += `Total Amount: RM ${totalPrice.toFixed(2)}\n\n`;
+            message += `⚠️ IMPORTANT: Payment link expires in 5 minutes!\n\n`;
+            message += `You will now be redirected to ToyyibPay secure payment page.\n\n`;
+            message += `Note: C.O.D charges apply upon delivery based on distance.\n\n`;
+            
+            alert(message);
+            
+            // Redirect to ToyyibPay payment page
+            window.location.href = paymentLink;
+        } else {
+            throw new Error('Failed to save order data. Please try again.');
+        }
+        
+    } catch (error) {
+        // Re-enable submit button
+        submitOrderBtn.disabled = false;
+        submitOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Proceed to Payment';
+        
+        // Show error message
+        alert(`Error: ${error.message}\n\nPlease try again or contact support.`);
+        
+        console.error('Order Submission Error:', error);
+    }
+}     
+
+// NEW FUNCTION: Send order data to Google Sheets
+async function sendOrderToGoogleSheets(orderData) {
+    try {
+        const response = await fetch(CUST_DATABASE_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Important for Google Apps Script
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        });
+        
+        // Note: With no-cors mode, we can't read the response
+        // But we assume it's successful if no network error
+        return { success: true };
+        
+    } catch (error) {
+        console.error('Error sending to Google Sheets:', error);
+        throw error;
+    }
+}
+
+        // Toggle between grid and list view
+        function toggleView(viewType) {
+            if (viewType === 'grid') {
+                catalogContainer.classList.remove('list-view');
+                catalogContainer.classList.add('catalog-grid');
+                gridViewBtn.classList.add('active');
+                listViewBtn.classList.remove('active');
+            } else {
+                catalogContainer.classList.remove('catalog-grid');
+                catalogContainer.classList.add('list-view');
+                listViewBtn.classList.add('active');
+                gridViewBtn.classList.remove('active');
+                
+                // Add list view styles dynamically
+                const style = document.createElement('style');
+                style.id = 'list-view-styles';
+                style.textContent = `
+                    .list-view {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 20px;
+                    }
+                    
+                    .list-view .firework-card {
+                        flex-direction: row;
+                        max-height: 250px;
+                    }
+                    
+                    .list-view .card-image-container {
+                        width: 250px;
+                        height: 100%;
+                        flex-shrink: 0;
+                    }
+                    
+                    .list-view .card-content {
+                        flex-grow: 1;
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        gap: 30px;
+                        padding-right: 30px;
+                    }
+                    
+                    .list-view .card-name {
+                        margin-bottom: 0;
+                        width: 200px;
+                    }
+                    
+                    .list-view .card-details {
+                        display: flex;
+                        flex-direction: row;
+                        gap: 20px;
+                        margin-bottom: 0;
+                        flex-grow: 1;
+                    }
+                    
+                    .list-view .detail-item {
+                        width: 100px;
+                        align-items: center;
+                    }
+                    
+                    .list-view .price-section {
+                        width: 150px;
+                        margin-top: 0;
+                    }
+                    
+                    @media (max-width: 1100px) {
+                        .list-view .firework-card {
+                            flex-direction: column;
+                            max-height: none;
+                        }
+                        
+                        .list-view .card-image-container {
+                            width: 100%;
+                            height: 200px;
+                        }
+                        
+                        .list-view .card-content {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 15px;
+                            padding-right: 22px;
+                        }
+                        
+                        .list-view .card-name {
+                            width: 100%;
+                        }
+                        
+                        .list-view .card-details {
+                            width: 100%;
+                        }
+                        
+                        .list-view .price-section {
+                            width: 100%;
+                        }
+                    }
+                `;
+                
+                // Remove old styles if they exist
+                const oldStyles = document.getElementById('list-view-styles');
+                if (oldStyles) oldStyles.remove();
+                
+                document.head.appendChild(style);
+            }
+        }
+
+        // Handle data from JSONP response
+function handleData(response) {
+    if (response && response.success) {
+        // Transform the data to match your original format
+        fireworksData = response.data.map(item => {
+            return {
+                code: item.Code || '',
+                name: item.Name || '',
+                shot: parseInt(item.Shot) || 0,
+                style: item.Style || '',
+                inch: parseInt(item.Inch) || 0,
+                duration: item.Duration || '0',
+                price: parseFloat(item.Price) || 0,
+                image: item.Image || '',
+                video: item.Video || ''
+            };
+        });
+        
+        // Remove any invalid items
+        fireworksData = fireworksData.filter(item => item.code && item.name);
+        
+        // Calculate and display initial stats
+        calculateStats(fireworksData);
+        
+        // Populate catalog with all fireworks
+        populateCatalog(fireworksData);
+        filteredData = fireworksData;
+        
+        // Hide splash screen after data loads (with slight delay for better UX)
+        setTimeout(() => {
+            const splashScreen = document.getElementById('splash-screen');
+            if (splashScreen) {
+                splashScreen.classList.add('fade-out');
+            }
+            // Remove splash-active class
+            document.body.classList.remove('splash-active');
+        }, 500);
+        
+    } else {
+        showError(response?.message || 'Failed to load data from server');
+        
+        // Still hide splash screen on error
+        setTimeout(() => {
+            const splashScreen = document.getElementById('splash-screen');
+            if (splashScreen) {
+                splashScreen.classList.add('fade-out');
+            }
+            // Remove splash-active class
+            document.body.classList.remove('splash-active');
+        }, 1000);
+    }
+}
+
+        // Show error message
+function showError(message) {
+    // Hide splash screen first
+    const splashScreen = document.getElementById('splash-screen');
+    if (splashScreen) {
+        splashScreen.classList.add('fade-out');
+    }
+
+    // Remove splash-active class
+    document.body.classList.remove('splash-active');
+    
+    // Show error in catalog
+    catalogContainer.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Data</h3>
+            <p>${message}</p>
+            <button class="filter-btn" onclick="initializePage()" style="margin-top: 20px;">
+                <i class="fas fa-redo"></i> Try Again
+            </button>
+        </div>
+    `;
+}
+
+// Update initializePage function to handle splash screen
+function initializePage() {
+    // Check network first
+    if (!checkNetworkStatus()) {
+        return;
+    }
+
+    // Add splash-active class to body
+    document.body.classList.add('splash-active');
+    
+    // Start fireworks animation
+    createFireworksAnimation();
+    
+    // Show loading state in catalog container
+    catalogContainer.innerHTML = `
+        <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <h3>Loading Fireworks Data...</h3>
+            <p>Fetching data from server...</p>
+        </div>
+    `;
+    
+    // Fetch data from Google Sheets using JSONP
+    fetchDataFromGoogleSheets(handleData);
+}
+
+        // Start the page when DOM is loaded
+        document.addEventListener("DOMContentLoaded", () => {
+
+    const contactBtn = document.querySelector('#agent .filter-btn');
+    if (contactBtn) {
+        contactBtn.addEventListener('click', () => {
+            alert('For agent partnership inquiries, please contact us at:\n\nPhone: 601160801477\nEmail: venturerush.dev@gmail.com\n\nWe will get back to you within 24 hours.');
+        });
+    }
+
+// Initialize sections
+initializeSections();
+
+            logMobileInfo();
+            checkServiceWorkerIssues();
+            // Set up filter button events
+            applyFiltersBtn.addEventListener("click", () => {
+                const filteredData = filterFireworks();
+                populateCatalog(filteredData);
+                filteredCountElement.textContent = filteredData.length;
+            });
+            
+            resetFiltersBtn.addEventListener("click", () => {
+                shotFilter.value = "all";
+                styleFilter.value = "all";
+                inchFilter.value = "all";
+                durationFilter.value = "all";
+                priceFilter.value = "all"; 
+                
+                populateCatalog(fireworksData);
+                filteredCountElement.textContent = fireworksData.length;
+            });
+            
+            // Set up modal events
+            closeModalBtn.addEventListener("click", closeVideoModal);
+            videoModal.addEventListener("click", (e) => {
+                if (e.target === videoModal) {
+                    closeVideoModal();
+                }
+            });
+            
+            // Set up order modal events
+            closeOrderModalBtn.addEventListener("click", closeOrderModal);
+            cancelOrderBtn.addEventListener("click", closeOrderModal);
+            orderModal.addEventListener("click", (e) => {
+                if (e.target === orderModal) {
+                    closeOrderModal();
+                }
+            });
+            
+           
+            
+            // Set up order form submission
+            orderForm.addEventListener("submit", handleOrderSubmit);
+            
+            // Set up view toggle events
+            gridViewBtn.addEventListener("click", () => toggleView('grid'));
+            listViewBtn.addEventListener("click", () => toggleView('list'));
+            
+            // Close modal on escape key
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    if (videoModal.style.display === "flex") {
+                        closeVideoModal();
+                    }
+                    if (orderModal.style.display === "flex") {
+                        closeOrderModal();
+                    }
+                }
+            });
+            
+            // Add a timeout to hide splash screen if data takes too long
+            setTimeout(() => {
+                const splashScreen = document.getElementById('splash-screen');
+                if (splashScreen && !splashScreen.classList.contains('fade-out')) {
+                    splashScreen.classList.add('fade-out');
+                    console.log('Safety timeout: Hiding splash screen after delay');
+                }
+            }, 15000); // 15 second maximum wait time
+            
+            // Initialize the page
+            initializePage();
+        });
+
+// Add event listeners for wheel functionality
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Initialize wheel on page load
+    initializeWheel();
+    
+    // Wheel event listeners
+    spinBtn.addEventListener('click', spinWheel);
+    wheelCloseBtn.addEventListener('click', closeWheelModal);
+    wheelContainer.addEventListener('click', (e) => {
+        if (e.target === wheelContainer) {
+            closeWheelModal();
+        }
+    });
+    
+    // Close wheel on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && wheelContainer.style.display === 'flex') {
+            closeWheelModal();
+        }
+    });
+    
+    // Check for existing prize on page load and update UI
+    setTimeout(() => {
+        if (getCurrentDiscount() > 0) {
+            console.log('User has existing discount:', getCurrentDiscount());
+        }
+    }, 1000);
+    
+    // Check and clear expired prizes (older than 24 hours)
+    const lastSpin = localStorage.getItem('lastSpinDate');
+    if (lastSpin) {
+        const lastSpinDate = new Date(lastSpin);
+        const now = new Date();
+        const diffHours = (now - lastSpinDate) / (1000 * 60 * 60);
+        
+        if (diffHours >= 24) {
+            clearSpinWheelPrize();
+            // Don't remove lastSpinDate here - let the clearSpinWheelPrize function handle it
+        }
+    }
+});
+
+// Track Order Functions
+async function trackOrder(orderId) {
+    const trackingResults = document.getElementById('tracking-results');
+    const trackingLoading = document.getElementById('tracking-loading');
+    const trackingError = document.getElementById('tracking-error');
+    const orderDetails = document.getElementById('order-details');
+    
+    // Reset display
+    trackingResults.style.display = 'block';
+    trackingLoading.style.display = 'block';
+    trackingError.style.display = 'none';
+    orderDetails.style.display = 'none';
+    
+    try {
+        // Fetch order data from Google Sheets
+        const response = await fetch(`${CUST_DATABASE_URL}?orderId=${encodeURIComponent(orderId)}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch order data');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.order) {
+            // Order found - update UI
+            updateOrderTracking(data.order);
+            trackingLoading.style.display = 'none';
+            orderDetails.style.display = 'block';
+        } else {
+            // Order not found
+            throw new Error(data.message || 'Order ID not found');
+        }
+        
+    } catch (error) {
+        trackingLoading.style.display = 'none';
+        trackingError.style.display = 'block';
+        document.getElementById('error-message').textContent = error.message;
+    }
+}
+
+function updateOrderTracking(orderData) {
+    // Update order details
+    document.getElementById('order-id-display').textContent = orderData.orderId || '-';
+    document.getElementById('customer-name-display').textContent = orderData.customerName || '-';
+    document.getElementById('customer-productCode-display').textContent = orderData.productCode || '-';
+    document.getElementById('payment-status-display').textContent = orderData.paymentStatus || '-';
+    
+    // Determine progress percentage based on logic
+    let progressPercent = 0;
+    let statusText = '';
+    
+    // Your logic from requirements:
+    // Check Bill Code (Column L)
+    if (!orderData.billCode || orderData.billCode === '') {
+        // Invalid Order ID
+        document.getElementById('order-status-display').textContent = 'Invalid Order ID';
+        return;
+    } else if (orderData.billCode.toLowerCase().startsWith('pending')) {
+        // 0% - Pending Payment
+        progressPercent = 10;
+        statusText = 'Pending Payment';
+    } else if (orderData.paymentStatus === 'paid') {
+        // 10% - Payment Received
+        progressPercent = 25;
+        statusText = 'Payment Received';
+        
+        // Check Delivery Status (Column M)
+        if (orderData.deliveryStatus === 'Notice') {
+            progressPercent = 45;
+            statusText = 'Workers Notice';
+        } else if (orderData.deliveryStatus === 'Packing') {
+            progressPercent = 65;
+            statusText = 'Packing Fireworks';
+        } else if (orderData.deliveryStatus === 'On Delivery') {
+            progressPercent = 80;
+            statusText = 'On Delivery';
+        } else if (orderData.deliveryStatus === 'Complete') {
+            progressPercent = 100;
+            statusText = 'Order Complete';
+        }
+    } else {
+        // Payment not paid but bill code exists
+        progressPercent = 0;
+        statusText = 'Pending Payment';
+    }
+    
+    // Update status display
+    document.getElementById('order-status-display').textContent = statusText;
+    
+    // Update progress bar
+    const progressFill = document.getElementById('progress-fill');
+    progressFill.style.width = `${progressPercent}%`;
+    
+    // Update progress points
+    const progressPoints = document.querySelectorAll('.progress-point');
+    progressPoints.forEach(point => {
+        const pointPercent = parseInt(point.dataset.percent);
+        const circle = point.querySelector('.point-circle');
+        
+        if (pointPercent <= progressPercent) {
+            // Active point
+            circle.style.backgroundColor = 'var(--primary)';
+            circle.style.boxShadow = '0 0 0 3px rgba(249, 115, 22, 0.2)';
+            point.querySelector('span').style.color = 'var(--dark)';
+            point.querySelector('span').style.fontWeight = '600';
+        } else {
+            // Inactive point
+            circle.style.backgroundColor = 'var(--gray)';
+            circle.style.boxShadow = 'none';
+            point.querySelector('span').style.color = 'var(--dark-gray)';
+            point.querySelector('span').style.fontWeight = 'normal';
+        }
+        
+        // Highlight current status
+        if (pointPercent === progressPercent) {
+            circle.style.transform = 'scale(1.3)';
+            circle.style.boxShadow = '0 0 0 5px rgba(249, 115, 22, 0.3)';
+        } else {
+            circle.style.transform = 'scale(1)';
+        }
+    });
+}
+
+// Event listener for track order button
+document.addEventListener('DOMContentLoaded', () => {
+    const trackOrderBtn = document.getElementById('track-order-btn');
+    const orderIdInput = document.getElementById('order-id-input');
+    
+    if (trackOrderBtn) {
+        trackOrderBtn.addEventListener('click', () => {
+            const orderId = orderIdInput.value.trim();
+            if (!orderId) {
+                alert('Please enter your Order ID');
+                return;
+            }
+            
+            // Show tracking section if hidden
+            const trackingResults = document.getElementById('tracking-results');
+            trackingResults.style.display = 'block';
+            
+            trackOrder(orderId);
+        });
+    }
+    
+    // Allow pressing Enter in the order ID input
+    if (orderIdInput) {
+        orderIdInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                trackOrderBtn.click();
+            }
+        });
+    }
+});
+    </script>
+</body>
+</html>

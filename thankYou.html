@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank You</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+  }
+  .container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 350px;
+    width: 70%;
+  }
+  h1 {
+    color: #f97316;
+    margin-bottom: 10px;
+  }
+  p {
+    color: #555;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  button {
+    background-color: #ffae76;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+  }
+  button:hover {
+    background-color: #f97316;
+  }
+  .checkmark {
+      font-size: 3.5rem;
+      color: #f97316;
+  }
+    @media (min-width: 768px) {
+      .container {
+        max-width: 500px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .checkmark {
+        font-size: 4rem;
+      }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="checkmark">🧨</div>
+  <h1>Thank You!</h1>
+  <p>Your order is confirmed. We’ll prepare your fireworks and see you soon!</p><br>
+  <h2 id="orderIdDisplay">Order ID : Loading...</h2>
+  <h5 style="color:#f97316;">Please remember your order id for future tracking</h5>
+  <br><br>
+  <button onclick="sendThankYou()">Back to Website</button>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const billcode = urlParams.get('billcode');
+const CHAT_URL = "https://q13dynamic-vr.com/";
+
+// Update the order ID display
+if(billcode) {
+  document.getElementById('orderIdDisplay').textContent = `Order ID : ${billcode}`;
+} else {
+  document.getElementById('orderIdDisplay').textContent = 'Order ID : Not available';
+}
+
+async function sendThankYou() {
+  window.location.href = CHAT_URL;
+}
+</script>
+
+</body>
+</html>
