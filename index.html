@@ -3314,6 +3314,7 @@ if (customerPhone.includes(' ')) {
             // Show confirmation message with discount info
             let message = `Order submitted successfully!\n\n`;
             message += `Product Price: RM ${currentOrderProduct.price.toFixed(2)}\n`;
+            message += `Product Quantity: ${quantity}\n`;
             message += `Admin Fee: RM 1\n`;
             if (discount > 0) {
                 message += `Discount: -RM ${discount.toFixed(2)}\n`;
