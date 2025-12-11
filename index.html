@@ -1588,6 +1588,44 @@ body.splash-active {
         justify-content: space-between;
     }
 }
+/* Star Rating System */
+.star-rating {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.75);
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 5;
+}
+
+.star-rating .stars {
+    display: flex;
+    gap: 2px;
+}
+
+.star-rating .star {
+    color: #ffd700;
+    font-size: 16px;
+}
+
+.star-rating .star.empty {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.star-rating .rating-score {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    margin-left: 5px;
+    min-width: 30px;
+    text-align: center;
+}
     </style>
 </head>
 <body>
@@ -2130,6 +2168,11 @@ const AGENT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7F
         let fireworksData = [];
         let filteredData = [];
         let currentOrderProduct = null;
+
+// Global variables to store min/max values
+let minSize = Infinity, maxSize = 0;
+let minDuration = Infinity, maxDuration = 0;
+let minShot = Infinity, maxShot = 0;
         
         // DOM elements
         const catalogContainer = document.getElementById("catalog-container");
@@ -2297,6 +2340,104 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Function to calculate min/max values from data
+function calculateMinMaxValues(data) {
+    data.forEach(item => {
+        // Size
+        const size = item.inch || 0;
+        if (size < minSize) minSize = size;
+        if (size > maxSize) maxSize = size;
+        
+        // Duration (in seconds)
+        const durationSeconds = convertDurationToSeconds(item.duration);
+        if (durationSeconds < minDuration) minDuration = durationSeconds;
+        if (durationSeconds > maxDuration) maxDuration = durationSeconds;
+        
+        // Shot
+        const shot = item.shot || 0;
+        if (shot < minShot) minShot = shot;
+        if (shot > maxShot) maxShot = shot;
+    });
+    
+    console.log('Min/Max values calculated:', {
+        minSize, maxSize,
+        minDuration, maxDuration,
+        minShot, maxShot
+    });
+}
+
+// Function to calculate star rating for a product
+function calculateStarRating(product) {
+    let totalPoints = 0;
+    
+    // 1. Size points (0-100 points)
+    const sizeRange = maxSize - minSize;
+    if (sizeRange > 0) {
+        const sizePointsPerInch = 100 / sizeRange;
+        const sizePoints = (product.inch - minSize) * sizePointsPerInch;
+        totalPoints += Math.min(100, Math.max(0, sizePoints));
+    }
+    
+    // 2. Duration points (0-100 points)
+    const durationSeconds = convertDurationToSeconds(product.duration);
+    const durationRange = maxDuration - minDuration;
+    if (durationRange > 0) {
+        const durationPointsPerSecond = 100 / durationRange;
+        const durationPoints = (durationSeconds - minDuration) * durationPointsPerSecond;
+        totalPoints += Math.min(100, Math.max(0, durationPoints));
+    }
+    
+    // 3. Shot points (0-100 points)
+    const shotRange = maxShot - minShot;
+    if (shotRange > 0) {
+        const shotPointsPerShot = 100 / shotRange;
+        const shotPoints = (product.shot - minShot) * shotPointsPerShot;
+        totalPoints += Math.min(100, Math.max(0, shotPoints));
+    }
+    
+    // 4. Style points (S=70, V=100)
+    if (product.style === 'S') {
+        totalPoints += 70;
+    } else if (product.style === 'V') {
+        totalPoints += 100;
+    }
+    
+    // Calculate stars (4 stars = 400 points)
+    const starPercentage = (totalPoints / 400) * 100;
+    const stars = Math.round((starPercentage / 100) * 4 * 2) / 2; // Half star increments
+    
+    return {
+        totalPoints: Math.min(400, totalPoints),
+        stars: Math.min(4, Math.max(0, stars)),
+        score: Math.min(4, stars)
+    };
+}
+
+// Function to generate star HTML
+function generateStarHTML(rating) {
+    let starsHTML = '';
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5;
+    const emptyStars = 4 - fullStars - (halfStar ? 1 : 0);
+    
+    // Full stars
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<i class="fas fa-star star"></i>';
+    }
+    
+    // Half star
+    if (halfStar) {
+        starsHTML += '<i class="fas fa-star-half-alt star"></i>';
+    }
+    
+    // Empty stars
+    for (let i = 0; i < emptyStars; i++) {
+        starsHTML += '<i class="far fa-star star empty"></i>';
+    }
+    
+    return starsHTML;
+}
 
 // Add this function to calculate Minimum Order Quantity
 function calculateMOQ(price) {
@@ -2853,6 +2994,10 @@ function formatDuration(duration) {
 
         // Create catalog card for a firework
         function createFireworkCard(item) {
+
+   // Calculate star rating for this product
+    const starRating = calculateStarRating(item);
+
             const card = document.createElement("div");
             card.className = "firework-card";
             card.dataset.shot = item.shot || 0;
@@ -2860,51 +3005,60 @@ function formatDuration(duration) {
             
             const durationDisplay = formatDuration(item.duration);
             
-            card.innerHTML = `
-                <div class="card-header">
-                    <div class="card-code">${item.code || 'N/A'}</div>
-                    <div class="card-style style-${item.style || ''}">${item.style || 'N/A'} Style</div>
+ // Update the card HTML to include star rating in the image container
+    card.innerHTML = `
+        <div class="card-header">
+            <div class="card-code">${item.code || 'N/A'}</div>
+            <div class="card-style style-${item.style || ''}">${item.style || 'N/A'} Style</div>
+        </div>
+        <div class="card-image-container">
+            <img src="${item.image || ''}" alt="${item.name || 'Firework'}" class="card-image" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+            <div class="shot-badge">${item.shot || 0} Shots</div>
+            <!-- STAR RATING ADDED HERE -->
+            <div class="star-rating">
+                <div class="stars">
+                    ${generateStarHTML(starRating.stars)}
                 </div>
-                <div class="card-image-container">
-                    <img src="${item.image || ''}" alt="${item.name || 'Firework'}" class="card-image" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
-                    <div class="shot-badge">${item.shot || 0} Shots</div>
-                    ${item.video ? `
-                    <div class="video-overlay" data-video="${item.video}" data-name="${item.name}">
-                        <button class="video-btn">
-                            <i class="fas fa-play"></i>
-                        </button>
-                    </div>
-                    ` : ''}
+                <div class="rating-score">${starRating.score.toFixed(1)}</div>
+            </div>
+            ${item.video ? `
+            <div class="video-overlay" data-video="${item.video}" data-name="${item.name}">
+                <button class="video-btn">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+            ` : ''}
+        </div>
+        <!-- Rest of your existing HTML remains the same... -->
+        <div class="card-content">
+            <h3 class="card-name">${item.name || 'Unnamed Firework'}</h3>
+            <div class="card-details">
+                <div class="detail-item">
+                    <span class="detail-label">Size</span>
+                    <span class="detail-value">${item.inch || 0}"</span>
                 </div>
-                <div class="card-content">
-                    <h3 class="card-name">${item.name || 'Unnamed Firework'}</h3>
-                    <div class="card-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Size</span>
-                            <span class="detail-value">${item.inch || 0}"</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Duration</span>
-                            <span class="detail-value duration-value">${durationDisplay}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Shot Count</span>
-                            <span class="detail-value">${item.shot || 0}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Style</span>
-                            <span class="detail-value">${item.style || 'N/A'}</span>
-                        </div>
-                    </div>
-                    <div class="price-section">
-                        <div class="price-label">Price (RM)</div>
-                        <div class="price-value">${item.price || 0}</div>
-                        <button class="buy-btn" data-product='${JSON.stringify(item)}'>
-                            <i class="fas fa-shopping-cart"></i> Buy Now
-                        </button>
-                    </div>
+                <div class="detail-item">
+                    <span class="detail-label">Duration</span>
+                    <span class="detail-value duration-value">${durationDisplay}</span>
                 </div>
-            `;
+                <div class="detail-item">
+                    <span class="detail-label">Shot Count</span>
+                    <span class="detail-value">${item.shot || 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Style</span>
+                    <span class="detail-value">${item.style || 'N/A'}</span>
+                </div>
+            </div>
+            <div class="price-section">
+                <div class="price-label">Price (RM)</div>
+                <div class="price-value">${item.price || 0}</div>
+                <button class="buy-btn" data-product='${JSON.stringify(item)}'>
+                    <i class="fas fa-shopping-cart"></i> Buy Now
+                </button>
+            </div>
+        </div>
+    `;            
             
             // Add click event to video button if video exists
             const videoBtn = card.querySelector('.video-overlay');
@@ -3530,6 +3684,9 @@ function handleData(response) {
         
         // Remove any invalid items
         fireworksData = fireworksData.filter(item => item.code && item.name);
+
+        // ADD THIS LINE: Calculate min/max values for star rating
+        calculateMinMaxValues(fireworksData);
         
         // Calculate and display initial stats
         calculateStats(fireworksData);
