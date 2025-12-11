@@ -1965,6 +1965,17 @@ body.splash-active {
     </select>
 </div>
 
+<!-- Add this filter group after the price filter -->
+<div class="filter-group">
+    <label for="star-filter">Star Rating</label>
+    <select id="star-filter" class="filter-select">
+        <option value="all">All Ratings</option>
+        <option value="1-2">1 - 2 Stars</option>
+        <option value="2-3">2 - 3 Stars</option>
+        <option value="3-4">3 - 4 Stars</option>
+    </select>
+</div>
+
             </div>
             <div class="filter-buttons">
                 <button class="filter-btn active" id="apply-filters">
@@ -2180,13 +2191,15 @@ let minShot = Infinity, maxShot = 0;
         const avgShotElement = document.getElementById("avg-shot");
         const avgDurationElement = document.getElementById("avg-duration");
         const filteredCountElement = document.getElementById("filtered-count");
-        const priceFilter = document.getElementById("price-filter");
+        
         
         // Filter elements
         const shotFilter = document.getElementById("shot-filter");
         const styleFilter = document.getElementById("style-filter");
         const inchFilter = document.getElementById("inch-filter");
         const durationFilter = document.getElementById("duration-filter");
+        const priceFilter = document.getElementById("price-filter");
+        const starFilter = document.getElementById('star-filter'); // ADD THIS LINE
         const applyFiltersBtn = document.getElementById("apply-filters");
         const resetFiltersBtn = document.getElementById("reset-filters");
         
@@ -3087,7 +3100,7 @@ function formatDuration(duration) {
             const inchValue = inchFilter.value;
             const durationValue = durationFilter.value;
             const priceValue = priceFilter.value; 
-            
+
             return fireworksData.filter(item => {
                 // Filter by shot count
                 if (shotValue !== "all") {
@@ -3139,6 +3152,25 @@ function formatDuration(duration) {
                     break;
             }
                 }
+
+// Filter by star rating - ADD THIS NEW SECTION
+        if (starFilter.value !== "all") {
+            // Calculate star rating for this item
+            const starRating = calculateStarRating(item);
+            const stars = starRating.stars;
+            
+            switch(starFilter.value) {
+                case "1-2":
+                    if (stars < 1 || stars > 2) return false;
+                    break;
+                case "2-3":
+                    if (stars < 2 || stars > 3) return false;
+                    break;
+                case "3-4":
+                    if (stars < 3 || stars > 4) return false;
+                    break;
+            }
+        }
                 return true;
             });
         }
@@ -3850,6 +3882,7 @@ document.getElementById('product-quantity').addEventListener('input', updateOrde
                 inchFilter.value = "all";
                 durationFilter.value = "all";
                 priceFilter.value = "all"; 
+                document.getElementById('star-filter').value = "all"; // ADD THIS LINE
                 
                 populateCatalog(fireworksData);
                 filteredCountElement.textContent = fireworksData.length;
