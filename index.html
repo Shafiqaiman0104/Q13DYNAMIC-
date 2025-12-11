@@ -2017,6 +2017,11 @@ body.splash-active {
                     <span class="order-label">Product Price:</span>
                     <span class="order-value" id="order-product-price">RM 0</span>
                 </div>
+<!-- Add this after the product price section in order modal -->
+<div class="order-item">
+    <span class="order-label">Minimum Order (MOQ):</span>
+    <span class="order-value" id="order-moq">-</span>
+</div>
 <!-- Add this after the product price section -->
 <div class="order-item">
     <span class="order-label">Quantity:</span>
@@ -2292,6 +2297,13 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Add this function to calculate Minimum Order Quantity
+function calculateMOQ(price) {
+    if (price < 100) return 3;
+    if (price < 200) return 2;
+    return 1;
+}
 
 // SPIN WHEEL FUNCTIONALITY
 const wheelContainer = document.getElementById('wheel-container');
@@ -3022,12 +3034,15 @@ function formatDuration(duration) {
 function openOrderModal(product) {
     currentOrderProduct = product;
     
+    // Calculate MOQ based on product price
+    const moq = calculateMOQ(product.price);
+    
     // Update order details
     orderProductName.textContent = `${product.code} - ${product.name}`;
     
-    // Reset form AND quantity
+    // Reset form AND set quantity to MOQ
     orderForm.reset();
-    document.getElementById('product-quantity').value = 1; // Reset to 1
+    document.getElementById('product-quantity').value = moq; // Set to MOQ instead of 1
     submitOrderBtn.disabled = false;
     
     // Calculate total price with discount
@@ -3041,7 +3056,6 @@ function openOrderModal(product) {
         checkAndShowSpinWheel(product.price);
     }
 }
-
         // Close order modal
         function closeOrderModal() {
             orderModal.style.display = "none";
@@ -3060,6 +3074,25 @@ function calculateTotalPrice() {
 // Update the updateOrderSummary function to include discount
 function updateOrderSummary() {
     if (!currentOrderProduct) return;
+
+    // Calculate MOQ
+    const moq = calculateMOQ(currentOrderProduct.price);
+    
+    // Display MOQ
+    const moqElement = document.getElementById('order-moq');
+    if (moqElement) {
+        moqElement.textContent = moq + ' unit(s)';
+        
+        // Highlight if quantity is at MOQ
+        const quantity = parseInt(document.getElementById('product-quantity').value) || 1;
+        if (quantity === moq) {
+            moqElement.style.color = 'var(--primary)';
+            moqElement.style.fontWeight = '700';
+        } else {
+            moqElement.style.color = 'var(--dark)';
+            moqElement.style.fontWeight = '600';
+        }
+    }
     
     // Get quantity
     const quantityInput = document.getElementById('product-quantity');
@@ -3589,7 +3622,8 @@ initializeSections();
 // Initialize agent form
 initializeAgentForm();
 
-// Add quantity button event listeners
+// Update the increase/decrease button event listeners:
+
 document.getElementById('increase-qty').addEventListener('click', () => {
     const quantityInput = document.getElementById('product-quantity');
     let quantity = parseInt(quantityInput.value) || 1;
@@ -3600,21 +3634,40 @@ document.getElementById('increase-qty').addEventListener('click', () => {
 });
 
 document.getElementById('decrease-qty').addEventListener('click', () => {
-    const quantityInput = document.getElementById('product-quantity');
-    let quantity = parseInt(quantityInput.value) || 1;
-    if (quantity > 1) {
-        quantityInput.value = quantity - 1;
-        updateOrderSummary();
-    }
-});
-
-// Update summary when quantity input changes
-document.getElementById('product-quantity').addEventListener('change', () => {
+    if (!currentOrderProduct) return;
+    
     const quantityInput = document.getElementById('product-quantity');
     let quantity = parseInt(quantityInput.value) || 1;
     
-    // Ensure quantity is within limits
-    if (quantity < 1) quantity = 1;
+    // Calculate MOQ for this product
+    const moq = calculateMOQ(currentOrderProduct.price);
+    
+    // Only decrease if above MOQ
+    if (quantity > moq) {
+        quantityInput.value = quantity - 1;
+        updateOrderSummary();
+    } else {
+        // Show message that user cannot go below MOQ
+        alert(`Minimum Order Quantity (MOQ) for this product is ${moq}. You cannot order less than this.`);
+    }
+});
+
+// Update the quantity input change event:
+
+document.getElementById('product-quantity').addEventListener('change', () => {
+    if (!currentOrderProduct) return;
+    
+    const quantityInput = document.getElementById('product-quantity');
+    let quantity = parseInt(quantityInput.value) || 1;
+    const moq = calculateMOQ(currentOrderProduct.price);
+    
+    // Ensure quantity is at least MOQ
+    if (quantity < moq) {
+        alert(`Minimum Order Quantity (MOQ) for this product is ${moq}. Setting quantity to ${moq}.`);
+        quantity = moq;
+    }
+    
+    // Ensure quantity is within maximum limit
     if (quantity > 10) quantity = 10;
     
     quantityInput.value = quantity;
