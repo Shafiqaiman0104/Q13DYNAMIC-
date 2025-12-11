@@ -1906,14 +1906,14 @@ body.splash-active {
                 <div class="filter-group">
                     <label for="shot-filter">Shot Count</label>
                     <select id="shot-filter" class="filter-select">
-                        <option value="all">All Shot Counts</option>
-                        <option value="49">49 Shots</option>
-                        <option value="138">138 Shots</option>
-                        <option value="168">168 Shots</option>
-                        <option value="188">188 Shots</option>
-                        <option value="198">198 Shots</option>
-                        <option value="200+">200+ Shots</option>
-                    </select>
+    <option value="all">All Shot Counts</option>
+    <option value="<49">&lt; 49 Shots</option> 
+    <option value="49-138">49 - 138 Shots</option>
+    <option value="138-168">138 - 168 Shots</option>
+    <option value="168-188">168 - 188 Shots</option>
+    <option value="188-200">188 - 200 Shots</option>
+    <option value="200>">200+ Shots</option>
+</select>
                 </div>
                 
                 <div class="filter-group">
@@ -1929,6 +1929,7 @@ body.splash-active {
                     <label for="inch-filter">Size (Inch)</label>
                     <select id="inch-filter" class="filter-select">
                         <option value="all">All Sizes</option>
+                        <option value="2">2"</option> 
                         <option value="4">4"</option>
                         <option value="5">5"</option>
                         <option value="6">6"</option>
@@ -1947,7 +1948,8 @@ body.splash-active {
                         <option value="all">All Durations</option>
                         <option value="short">Short (< 1 min)</option>
                         <option value="medium">Medium (1-2 min)</option>
-                        <option value="long">Long (> 2 min)</option>
+                        <option value="long">Long (2-3 min)</option>  <!-- CHANGE THIS -->
+                        <option value="extra-long">Extra Long (> 3 min)</option>  <!-- ADD THIS -->
                     </select>
                 </div>
 
@@ -3102,14 +3104,24 @@ function formatDuration(duration) {
             const priceValue = priceFilter.value; 
 
             return fireworksData.filter(item => {
-                // Filter by shot count
-                if (shotValue !== "all") {
-                    if (shotValue === "200+") {
-                        if (item.shot < 200) return false;
-                    } else {
-                        if (item.shot !== parseInt(shotValue)) return false;
-                    }
-                }
+// Filter by shot count
+if (shotValue !== "all") {
+    const shot = item.shot || 0;
+    
+    if (shotValue === "<49") {
+        if (shot >= 49) return false;
+    } else if (shotValue === "49-138") {
+        if (shot < 49 || shot > 138) return false;
+    } else if (shotValue === "138-168") {
+        if (shot < 138 || shot > 168) return false;
+    } else if (shotValue === "168-188") {
+        if (shot < 168 || shot > 188) return false;
+    } else if (shotValue === "188-200") {
+        if (shot < 188 || shot > 200) return false;
+    } else if (shotValue === "200>") {
+        if (shot <= 200) return false;
+    }
+}
                 
                 // Filter by style
                 if (styleValue !== "all" && item.style !== styleValue) return false;
@@ -3118,14 +3130,15 @@ function formatDuration(duration) {
                 if (inchValue !== "all" && item.inch !== parseInt(inchValue)) return false;
                 
                 // Filter by duration
-                if (durationValue !== "all") {
-                    const durationSeconds = convertDurationToSeconds(item.duration);
-                    
-                    // Apply duration filter
-                    if (durationValue === "short" && durationSeconds >= 60) return false;
-                    if (durationValue === "medium" && (durationSeconds < 60 || durationSeconds > 120)) return false;
-                    if (durationValue === "long" && durationSeconds <= 120) return false;
-                }
+if (durationValue !== "all") {
+    const durationSeconds = convertDurationToSeconds(item.duration);
+    
+    // Apply duration filter
+    if (durationValue === "short" && durationSeconds >= 60) return false;
+    if (durationValue === "medium" && (durationSeconds < 60 || durationSeconds > 120)) return false;
+    if (durationValue === "long" && (durationSeconds < 120 || durationSeconds > 180)) return false;  // CHANGE THIS
+    if (durationValue === "extra-long" && durationSeconds <= 180) return false;  // ADD THIS
+}
 
 // NEW: Filter by price range
         if (priceValue !== "all") {
