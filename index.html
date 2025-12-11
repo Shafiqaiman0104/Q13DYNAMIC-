@@ -1621,20 +1621,20 @@ body.splash-active {
 
 
 /* Alternate timing for each star */
-.star-rating .star:nth-child(1) { animation-delay: 0s; }
-.star-rating .star:nth-child(2) { animation-delay: 0.2s; }
-.star-rating .star:nth-child(3) { animation-delay: 0.4s; }
-.star-rating .star:nth-child(4) { animation-delay: 0.6s; }
-.star-rating .star:nth-child(5) { animation-delay: 0.8s; }
+.star-rating .fire-icon:nth-child(1) { animation-delay: 0s; }
+.star-rating .fire-icon:nth-child(2) { animation-delay: 0.2s; }
+.star-rating .fire-icon:nth-child(3) { animation-delay: 0.4s; }
+.star-rating .fire-icon:nth-child(4) { animation-delay: 0.6s; }
+.star-rating .fire-icon:nth-child(5) { animation-delay: 0.8s; }
 
-.star-rating .star {
-    color: #ffd700;
+.star-rating .fire-icon {
+    color: #f97316; /* Full color */
     font-size: 16px;
     animation: starBounce 1s ease-in-out infinite;
 }
 
-.star-rating .star.empty {
-    color: rgba(255, 255, 255, 0.3);
+.star-rating .fire-icon.empty {
+    color: grey; /* Empty color */
 }
 
 .star-rating .rating-score {
@@ -1753,8 +1753,12 @@ body.splash-active {
     font-size: 24px;
 }
 
-.total-stars .star {
-    color: #ffd700;
+.total-stars .fire-icon {
+    color: #f97316; /* Change from gold to orange */
+}
+
+.total-stars .fire-icon.empty {
+    color: grey; /* Empty color */
 }
 
 /* Bar Chart Styles */
@@ -2175,12 +2179,12 @@ body.splash-active {
 
 <!-- Add this filter group after the price filter -->
 <div class="filter-group">
-    <label for="star-filter">Star Rating</label>
+    <label for="star-filter">🔥 Rating</label>
     <select id="star-filter" class="filter-select">
         <option value="all">All Ratings</option>
-        <option value="1-2">1 - 2 Stars</option>
-        <option value="2-3">2 - 3 Stars</option>
-        <option value="3-4">3 - 4 Stars</option>
+        <option value="1-2">1 - 2 🔥</option>
+        <option value="2-3">2 - 3 🔥</option>
+        <option value="3-4">3 - 4 🔥</option>
     </select>
 </div>
 
@@ -2834,29 +2838,28 @@ function calculateStarRating(product) {
     };
 }
 
-// Function to generate star HTML
 function generateStarHTML(rating) {
-    let starsHTML = '';
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5;
-    const emptyStars = 4 - fullStars - (halfStar ? 1 : 0);
+    let fireHTML = '';
+    const fullFires = Math.floor(rating);
+    const halfFire = rating % 1 >= 0.5;
+    const emptyFires = 4 - fullFires - (halfFire ? 1 : 0);
     
-    // Full stars
-    for (let i = 0; i < fullStars; i++) {
-        starsHTML += '<i class="fas fa-star star"></i>';
+    // Full fire icons
+    for (let i = 0; i < fullFires; i++) {
+        fireHTML += '<i class="fas fa-fire fire-icon"></i>';
     }
     
-    // Half star
-    if (halfStar) {
-        starsHTML += '<i class="fas fa-star-half-alt star"></i>';
+    // Half fire icon (use half-star as fallback, then adjust with CSS if needed)
+    if (halfFire) {
+        fireHTML += '<i class="fas fa-fire fire-icon" style="opacity: 0.7"></i>';
     }
     
-    // Empty stars
-    for (let i = 0; i < emptyStars; i++) {
-        starsHTML += '<i class="far fa-star star empty"></i>';
+    // Empty fire icons
+    for (let i = 0; i < emptyFires; i++) {
+        fireHTML += '<i class="fas fa-fire fire-icon empty"></i>';
     }
     
-    return starsHTML;
+    return fireHTML;
 }
 
 // Add this function to calculate Minimum Order Quantity
@@ -4807,4 +4810,3 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
-
