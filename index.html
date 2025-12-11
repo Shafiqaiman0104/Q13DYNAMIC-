@@ -1609,9 +1609,28 @@ body.splash-active {
     gap: 2px;
 }
 
+/* Bounce animation for stars */
+@keyframes starBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+
+/* Alternate timing for each star */
+.star-rating .star:nth-child(1) { animation-delay: 0s; }
+.star-rating .star:nth-child(2) { animation-delay: 0.2s; }
+.star-rating .star:nth-child(3) { animation-delay: 0.4s; }
+.star-rating .star:nth-child(4) { animation-delay: 0.6s; }
+.star-rating .star:nth-child(5) { animation-delay: 0.8s; }
+
 .star-rating .star {
     color: #ffd700;
     font-size: 16px;
+    animation: starBounce 1s ease-in-out infinite;
 }
 
 .star-rating .star.empty {
@@ -4788,3 +4807,4 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
+
