@@ -2278,6 +2278,10 @@ body.splash-active {
                     <span class="order-label">Product Price:</span>
                     <span class="order-value" id="order-product-price">RM 0</span>
                 </div>
+                <div class="order-item">
+                    <span class="order-label">Postage Fee:</span>
+                    <span class="order-value" id="order-postage-fee">RM 0</span>
+                </div>
 <!-- Add this after the product price section in order modal -->
 <div class="order-item">
     <span class="order-label">Minimum Order (MOQ):</span>
@@ -3709,16 +3713,27 @@ function updateOrderSummary() {
     const productPricePerUnit = currentOrderProduct.price || 0;
     const totalProductPrice = productPricePerUnit * quantity;
     const paymentFee = 1;
+
+    // Calculate postage fee (postage per unit × quantity)
+    const postagePerUnit = currentOrderProduct.postage || 0;
+    const totalPostage = postagePerUnit * quantity;
     
     // Check if product is eligible for discount (≥ RM500)
     const isEligibleForDiscount = totalProductPrice >= 500;
     
     // Only apply discount if product is eligible AND user has a saved prize
     const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
-    const totalPrice = totalProductPrice + paymentFee - discount;
+     const totalPrice = totalProductPrice + paymentFee + totalPostage - discount; // ADD POSTAGE HERE
     
     // Update order summary display
     orderProductPrice.textContent = `RM ${totalProductPrice.toFixed(2)} (${quantity} × RM ${productPricePerUnit.toFixed(2)})`;
+
+  // Update postage fee display
+    const postageElement = document.getElementById('order-postage-fee');
+    if (postageElement) {
+        postageElement.textContent = `RM ${totalPostage.toFixed(2)} (${quantity} × RM ${postagePerUnit.toFixed(2)})`;
+    }
+
     orderTotalPrice.textContent = `RM ${totalPrice.toFixed(2)}`;
     
     // Add discount line to order summary
@@ -3924,7 +3939,10 @@ if (customerPhone.includes(' ')) {
     // Check if product is eligible for discount (total price ≥ RM500)
     const isEligibleForDiscount = totalProductPrice >= 500;
     const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
-    const totalPrice = totalProductPrice + paymentFee - discount;
+    // Calculate postage fee
+    const postagePerUnit = currentOrderProduct.postage || 0;
+    const totalPostage = postagePerUnit * quantity;
+    const totalPrice = totalProductPrice + paymentFee + totalPostage - discount;
     
     // Create order data object
     const orderData = {
@@ -3933,6 +3951,7 @@ if (customerPhone.includes(' ')) {
         productName: currentOrderProduct.name,
         productPrice: currentOrderProduct.price,
         productQuantity: quantity, // ADD THIS
+        postageFee: totalPostage, // ADD THIS LINE
         discount: discount, // Add discount to order data
         customerName: customerName,
         customerPhone: customerPhone,
@@ -3960,6 +3979,7 @@ if (customerPhone.includes(' ')) {
             let message = `Order submitted successfully!\n\n`;
             message += `Product Price: RM ${currentOrderProduct.price.toFixed(2)}\n`;
             message += `Product Quantity: ${quantity}\n`;
+            message += `Postage Fee: RM ${totalPostage.toFixed(2)} (${quantity} × RM ${postagePerUnit.toFixed(2)})\n`; // ADD THIS LINE
             message += `Admin Fee: RM 1\n`;
             if (discount > 0) {
                 message += `Discount: -RM ${discount.toFixed(2)}\n`;
@@ -4131,7 +4151,8 @@ function handleData(response) {
                 duration: item.Duration || '0',
                 price: parseFloat(item.Price) || 0,
                 image: item.Image || '',
-                video: item.Video || ''
+                video: item.Video || '',
+                postage: parseFloat(item.Postage) || 0  // ADD THIS LINE
             };
         });
         
