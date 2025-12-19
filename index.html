@@ -2463,12 +2463,12 @@ body.splash-active {
 
     <script>
         // Your Apps Script URL
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
+        const PRODUCT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
 
-  const CUST_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
+  const ORDER_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
 
 // AGENT FORM FUNCTIONS
-const AGENT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
+const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
        
 
         // Global variables
@@ -3252,7 +3252,7 @@ function fetchDataFromGoogleSheets(callback) {
         });
     }, 15000); // 15 second timeout for mobile
     
-    script.src = `${APPS_SCRIPT_URL}?format=jsonp&callback=${callbackName}&t=${new Date().getTime()}&mobile=${isMobile ? 'yes' : 'no'}&v=1.0`;
+    script.src = `${PRODUCT_DATABASE_URL}?format=jsonp&callback=${callbackName}&t=${new Date().getTime()}&mobile=${isMobile ? 'yes' : 'no'}&v=1.0`;
     
     // Define the callback function
     window[callbackName] = function(response) {
@@ -4011,7 +4011,7 @@ if (customerPhone.includes(' ')) {
 // NEW FUNCTION: Send order data to Google Sheets
 async function sendOrderToGoogleSheets(orderData) {
     try {
-        const response = await fetch(CUST_DATABASE_URL, {
+        const response = await fetch(ORDER_DATABASE_URL, {
             method: 'POST',
             mode: 'no-cors', // Important for Google Apps Script
             headers: {
@@ -4601,7 +4601,7 @@ async function handleAgentSubmit(event) {
 async function submitAgentForm(formData) {
     try {
         // Create URL with query parameters
-        const url = new URL(AGENT_SCRIPT_URL);
+        const url = new URL(AGENT_DATABASE_URL);
         url.searchParams.append('agentId', formData.agentId);
         url.searchParams.append('name', formData.name);
         url.searchParams.append('phone', formData.phone);
@@ -4688,7 +4688,7 @@ async function trackOrder(orderId) {
     
     try {
         // Fetch order data from Google Sheets
-        const response = await fetch(`${CUST_DATABASE_URL}?orderId=${encodeURIComponent(orderId)}`);
+        const response = await fetch(`${ORDER_DATABASE_URL}?orderId=${encodeURIComponent(orderId)}`);
         
         if (!response.ok) {
             throw new Error('Failed to fetch order data');
@@ -4830,6 +4830,5 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
-
 
 
