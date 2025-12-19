@@ -1,6 +1,9 @@
 # nixpacks.toml
 [phases]
-setup.aptPackages = ["sed"]  # We need sed for replacement
+setup.aptPackages = ["sed", "nodejs", "npm"]
+
+[phases.install]
+cmds = ["npm install -g serve"]
 
 [phases.build]
 cmds = [
