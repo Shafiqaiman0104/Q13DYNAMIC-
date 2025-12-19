@@ -1251,6 +1251,144 @@
         </div>
     </div>
 </div>
+<!-- Edit Order Modal -->
+<div id="editOrderModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Order</h3>
+            <button class="close-btn" onclick="closeEditOrderModal()">&times;</button>
+        </div>
+        <form id="editOrderForm">
+            <input type="hidden" id="edit-order-row" name="rowNumber">
+            <input type="hidden" id="edit-order-original-billcode" name="originalBillCode">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-timestamp">Timestamp</label>
+                    <input type="text" class="form-input" id="edit-order-timestamp" name="timestamp" disabled style="background-color: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-name">Name *</label>
+                    <input type="text" class="form-input" id="edit-order-name" name="name" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-phone">Phone *</label>
+                    <input type="tel" class="form-input" id="edit-order-phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-email">Email</label>
+                    <input type="email" class="form-input" id="edit-order-email" name="email">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="edit-order-address">Address</label>
+                <textarea class="form-input" id="edit-order-address" name="address" rows="3"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                     <label class="form-label" for="edit-order-product-code">Product Code</label>
+                     <input type="text" class="form-input" id="edit-order-product-code" name="productCode">
+                </div>
+                <div class="form-group">
+                     <label class="form-label" for="edit-order-product-name">Product Name</label>
+                     <input type="text" class="form-input" id="edit-order-product-name" name="productName">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-product-quantity">Product Quantity</label>
+                    <input type="number" class="form-input" id="edit-order-product-quantity" name="productQuantity" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-postage-fee">Postage Fee (RM)</label>
+                    <input type="number" class="form-input" id="edit-order-postage-fee" name="postageFee" step="0.01" min="0" value="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-note">Note</label>
+                    <textarea class="form-input" id="edit-order-note" name="note" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-spin-prize">Spin Prize</label>
+                    <input type="text" class="form-input" id="edit-order-spin-prize" name="spinPrize">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-total">Total (RM)</label>
+                    <input type="number" class="form-input" id="edit-order-total" name="total" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-payment-status">Payment Status</label>
+                    <select class="form-input" id="edit-order-payment-status" name="paymentStatus" required>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-bill-code">Bill Code</label>
+                    <input type="text" class="form-input" id="edit-order-bill-code" name="billCode" disabled style="background-color: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-delivery-status">Delivery Status *</label>
+                    <select class="form-input" id="edit-order-delivery-status" name="deliveryStatus" required>
+                        <option value="pending">Pending</option>
+                        <option value="Notice">Notice</option>
+                        <option value="Packing">Packing</option>
+                        <option value="On Delivery">On Delivery</option>
+                        <option value="Complete">Complete</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-userid">User ID</label>
+                    <input type="text" class="form-input" id="edit-order-userid" name="userid" disabled style="background-color: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-order-remark">Remark</label>
+                    <textarea class="form-input" id="edit-order-remark" name="remark" rows="2"></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditOrderModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Order</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Order Confirmation Modal -->
+<div id="deleteOrderModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Delete Order</h3>
+            <button class="close-btn" onclick="closeDeleteOrderModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <p id="delete-order-confirm-text">Are you sure you want to delete this order?</p>
+            <input type="hidden" id="delete-order-billcode">
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteOrderModal()">Cancel</button>
+            <button type="button" class="btn btn-danger" onclick="confirmDeleteOrder()">Delete Order</button>
+        </div>
+    </div>
+</div>
     </div>
 
     <script>
@@ -1957,18 +2095,164 @@
             });
         }
 
-        // Edit functions (placeholder for demo)
-        function editOrder(billCode) {
-            alert(`Would open edit form for order: ${billCode}`);
-            // In a real implementation, this would open a modal with the order data for editing
-        }
+async function editOrder(billCode) {
+    try {
+        const response = await fetch(`${CUSTOMER_DB_URL}?orderId=${encodeURIComponent(billCode)}`);
+        const result = await response.json();
 
-        function deleteOrder(billCode) {
-            if (confirm(`Are you sure you want to delete order ${billCode}?`)) {
-                alert(`Order ${billCode} would be deleted.`);
-                // In a real implementation, this would send a DELETE request to the API
-            }
+        console.log('Edit Order Response:', result);
+        
+        if (!result.success || !result.order) {
+            alert('Order not found: ' + (result.message || 'Unknown error'));
+            return;
         }
+        
+        const order = result.order;
+
+        // Fill the edit form with order data
+        document.getElementById('edit-order-row').value = order.rowNumber || '';
+        document.getElementById('edit-order-original-billcode').value = order.billCode || '';
+        
+        document.getElementById('edit-order-timestamp').value = formatDate(order.timestamp) || '';
+        const name = order.customerName || order.CustomerName || order.name || order.Name || '';
+        document.getElementById('edit-order-name').value = name;
+        document.getElementById('edit-order-phone').value = order.customerPhone || '';
+        document.getElementById('edit-order-email').value = order.customerEmail || '';
+        document.getElementById('edit-order-address').value = order.deliveryAddress || '';
+        const productCode = order.productCode || order.ProductCode || '';
+        document.getElementById('edit-order-product-code').value = productCode;
+        document.getElementById('edit-order-product-name').value = order.productName || '';
+        document.getElementById('edit-order-product-quantity').value = order.productQuantity || 1;
+        document.getElementById('edit-order-postage-fee').value = order.postageFee || 0;
+        document.getElementById('edit-order-note').value = order.customerNote || '';
+        document.getElementById('edit-order-spin-prize').value = order.spinPrize || '';
+        document.getElementById('edit-order-total').value = order.totalPrice || 0;
+        document.getElementById('edit-order-payment-status').value = order.paymentStatus || 'pending';
+        document.getElementById('edit-order-bill-code').value = order.billCode || '';
+        document.getElementById('edit-order-delivery-status').value = order.deliveryStatus || 'pending';
+        document.getElementById('edit-order-userid').value = order.userId || '';
+        document.getElementById('edit-order-remark').value = order.remark || '';
+        
+        // Show the modal
+        document.getElementById('editOrderModal').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error loading order for editing:', error);
+        alert('Error loading order: ' + error.message);
+    }
+}
+
+       // Delete Order - Opens confirmation modal
+function deleteOrder(billCode) {
+    // Set the bill code in the delete modal
+    document.getElementById('delete-order-billcode').value = billCode;
+    document.getElementById('delete-order-confirm-text').textContent = 
+        `Are you sure you want to delete order with Bill Code: ${billCode}?`;
+    
+    // Show the delete modal
+    document.getElementById('deleteOrderModal').style.display = 'block';
+}
+
+// Close edit order modal
+function closeEditOrderModal() {
+    document.getElementById('editOrderModal').style.display = 'none';
+    document.getElementById('editOrderForm').reset();
+}
+
+// Close delete order modal
+function closeDeleteOrderModal() {
+    document.getElementById('deleteOrderModal').style.display = 'none';
+}
+
+document.getElementById('editOrderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const orderData = {
+        action: 'updateOrder',
+        originalBillCode: formData.get('originalBillCode'),
+        rowNumber: formData.get('rowNumber'),
+        name: document.getElementById('edit-order-name').value,
+        phone: document.getElementById('edit-order-phone').value,
+        email: document.getElementById('edit-order-email').value,
+        address: document.getElementById('edit-order-address').value,
+        productCode: document.getElementById('edit-order-product-code').value,
+        productName: document.getElementById('edit-order-product-name').value,
+        productQuantity: document.getElementById('edit-order-product-quantity').value,
+        postageFee: document.getElementById('edit-order-postage-fee').value,
+        note: document.getElementById('edit-order-note').value,
+        spinPrize: document.getElementById('edit-order-spin-prize').value,
+        total: document.getElementById('edit-order-total').value,
+        paymentStatus: document.getElementById('edit-order-payment-status').value,
+        deliveryStatus: document.getElementById('edit-order-delivery-status').value,
+        remark: document.getElementById('edit-order-remark').value
+    };
+    
+    // Validate required fields
+    if (!orderData.name || !orderData.phone || !orderData.total) {
+        alert('Please fill in all required fields (Name, Phone, Total)');
+        return;
+    }
+    
+    try {
+        const response = await fetch(CUSTOMER_DB_URL, {
+            method: 'POST',
+            body: JSON.stringify(orderData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Order updated successfully!');
+            closeEditOrderModal();
+            
+            // Refresh the orders data
+            ordersData = await fetchOrdersData();
+            displayOrdersData();
+            updateDashboardStats();
+        } else {
+            alert('Error updating order: ' + (result.message || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('Error updating order: ' + error.message);
+    }
+});
+
+// Confirm delete order
+async function confirmDeleteOrder() {
+    const billCode = document.getElementById('delete-order-billcode').value;
+    
+    if (!billCode) {
+        alert('Cannot delete order: Missing Bill Code');
+        return;
+    }
+    
+    try {
+        const response = await fetch(CUSTOMER_DB_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'deleteOrder',
+                billCode: billCode
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Order deleted successfully!');
+            closeDeleteOrderModal();
+            
+            // Refresh the orders data
+            ordersData = await fetchOrdersData();
+            displayOrdersData();
+            updateDashboardStats();
+        } else {
+            alert('Error deleting order: ' + (result.message || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('Error deleting order: ' + error.message);
+    }
+}
 
         // Edit agent - Opens modal
 function editAgent(agentId) {
