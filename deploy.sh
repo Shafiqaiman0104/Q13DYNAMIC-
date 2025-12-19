@@ -1,6 +1,16 @@
 #!/bin/bash
 echo "=== Q13 Dynamic Deployment ==="
 
+# Debug: Show Node.js and npm version
+echo "Node version: $(node --version 2>/dev/null || echo 'Not installed')"
+echo "NPM version: $(npm --version 2>/dev/null || echo 'Not installed')"
+
+# Try to install serve if not present
+if ! command -v serve &> /dev/null; then
+    echo "serve command not found, installing..."
+    npm install -g serve 2>/dev/null || echo "Failed to install serve"
+fi
+
 # Debug: Show current directory
 echo "Current directory: $(pwd)"
 echo "Files in directory:"
