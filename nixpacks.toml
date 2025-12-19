@@ -1,0 +1,12 @@
+# nixpacks.toml
+[phases]
+setup.aptPackages = ["nodejs", "npm"]
+
+[phases.install]
+cmds = ["npm install -g serve"]
+
+[phases.build]
+cmds = ["chmod +x deploy.sh && ./deploy.sh"]
+
+[start]
+cmd = "serve -s . -l 3000"
