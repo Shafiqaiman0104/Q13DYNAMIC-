@@ -1,17 +1,12 @@
 # nixpacks.toml
 [phases]
-setup.aptPackages = ["sed", "nginx"]
+setup.aptPackages = ["sed", "python3"]
 
 [phases.build]
 cmds = [
-    "echo '=== Environment Variables ==='",
-    "echo 'PRODUCT_DATABASE_URL: $PRODUCT_DATABASE_URL'",
-    "echo 'ORDER_DATABASE_URL: $ORDER_DATABASE_URL'",
-    "echo 'AGENT_DATABASE_URL: $AGENT_DATABASE_URL'",
     "chmod +x deploy.sh",
-    "./deploy.sh",
-    "cp nginx.conf /etc/nginx/conf.d/default.conf 2>/dev/null || true"
+    "./deploy.sh"
 ]
 
 [start]
-cmd = "nginx -g 'daemon off;'"
+cmd = "python3 -m http.server 3000"
