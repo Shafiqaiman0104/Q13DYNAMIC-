@@ -1393,9 +1393,9 @@
 
     <script>
         // URLs for Google Apps Script Web Apps
-        const CUSTOMER_DB_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
-        const AGENT_DB_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
-        const PRODUCT_DB_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
+        const ORDER_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
+        const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
+        const PRODUCT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
 
         // Global variables for data
         let ordersData = [];
@@ -1512,8 +1512,8 @@
         // Function to fetch orders data
         async function fetchOrdersData() {
             try {
-                console.log('Fetching orders data from:', CUSTOMER_DB_URL);
-                const response = await fetch(CUSTOMER_DB_URL);
+                console.log('Fetching orders data from:', ORDER_DATABASE_URL);
+                const response = await fetch(ORDER_DATABASE_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1547,8 +1547,8 @@
         // Function to fetch agents data - FIXED for email space issue
         async function fetchAgentsData() {
             try {
-                console.log('Fetching agents data from:', AGENT_DB_URL);
-                const response = await fetch(AGENT_DB_URL);
+                console.log('Fetching agents data from:', AGENT_DATABASE_URL);
+                const response = await fetch(AGENT_DATABASE_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1584,8 +1584,8 @@
         // Function to fetch products data
         async function fetchProductsData() {
             try {
-                console.log('Fetching products data from:', PRODUCT_DB_URL);
-                const response = await fetch(PRODUCT_DB_URL);
+                console.log('Fetching products data from:', PRODUCT_DATABASE_URL);
+                const response = await fetch(PRODUCT_DATABASE_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -2097,7 +2097,7 @@
 
 async function editOrder(billCode) {
     try {
-        const response = await fetch(`${CUSTOMER_DB_URL}?orderId=${encodeURIComponent(billCode)}`);
+        const response = await fetch(`${ORDER_DATABASE_URL}?orderId=${encodeURIComponent(billCode)}`);
         const result = await response.json();
 
         console.log('Edit Order Response:', result);
@@ -2195,7 +2195,7 @@ document.getElementById('editOrderForm').addEventListener('submit', async functi
     }
     
     try {
-        const response = await fetch(CUSTOMER_DB_URL, {
+        const response = await fetch(ORDER_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(orderData)
         });
@@ -2228,7 +2228,7 @@ async function confirmDeleteOrder() {
     }
     
     try {
-        const response = await fetch(CUSTOMER_DB_URL, {
+        const response = await fetch(ORDER_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify({
                 action: 'deleteOrder',
@@ -2387,7 +2387,7 @@ function deleteAgent(agentId) {
             };
             
             try {
-                const response = await fetch(PRODUCT_DB_URL, {
+                const response = await fetch(PRODUCT_DATABASE_URL, {
                     method: 'POST',
                     body: JSON.stringify(formData)
                 });
@@ -2415,7 +2415,7 @@ function deleteAgent(agentId) {
             const productCode = document.getElementById('delete-product-code').value;
             
             try {
-                const response = await fetch(PRODUCT_DB_URL, {
+                const response = await fetch(PRODUCT_DATABASE_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'delete',
@@ -2514,7 +2514,7 @@ async function handleAddProductSubmit(e) {
     }
     
     try {
-        const response = await fetch(PRODUCT_DB_URL, {
+        const response = await fetch(PRODUCT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(productData)
         });
@@ -2586,7 +2586,7 @@ document.getElementById('addAgentForm').addEventListener('submit', async functio
     }
     
     try {
-        const response = await fetch(AGENT_DB_URL, {
+        const response = await fetch(AGENT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(agentData)
         });
@@ -2631,7 +2631,7 @@ document.getElementById('editAgentForm').addEventListener('submit', async functi
     }
     
     try {
-        const response = await fetch(AGENT_DB_URL, {
+        const response = await fetch(AGENT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(agentData)
         });
@@ -2664,7 +2664,7 @@ async function confirmDeleteAgent() {
     }
     
     try {
-        const response = await fetch(AGENT_DB_URL, {
+        const response = await fetch(AGENT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify({
                 action: 'delete',
