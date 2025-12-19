@@ -10,7 +10,7 @@ cmds = [
     "echo 'AGENT_DATABASE_URL: $AGENT_DATABASE_URL'",
     "chmod +x deploy.sh",
     "./deploy.sh",
-    "cp nginx.conf /etc/nginx/conf.d/default.conf"
+    "cp nginx.conf /etc/nginx/conf.d/default.conf 2>/dev/null || true"
 ]
 
 [start]
