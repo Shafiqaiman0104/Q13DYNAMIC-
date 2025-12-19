@@ -2462,13 +2462,9 @@ body.splash-active {
     </footer>
 
     <script>
-const PROXY_BASE_URL = 'http://localhost:3001'; // Change to your VPS domain in production
-const PROXY_ENDPOINTS = {
-  products: `${PROXY_BASE_URL}/api/products`,
-  orders: `${PROXY_BASE_URL}/api/orders`,
-  agents: `${PROXY_BASE_URL}/api/agents`,
-  trackOrder: (orderId) => `${PROXY_BASE_URL}/api/track-order/${orderId}`
-};
+        const PRODUCT_DATABASE_URL = window.ENV_PRODUCT_DATABASE_URL;
+        const ORDER_DATABASE_URL = window.ENV_ORDER_DATABASE_URL;
+        const AGENT_DATABASE_URL = window.ENV_AGENT_DATABASE_URL;
        
 
         // Global variables
@@ -3228,16 +3224,58 @@ function checkServiceWorkerIssues() {
     }
 }
 
-// Update your fetchDataFromGoogleSheets function:
-async function fetchDataFromGoogleSheets() {
-  try {
-    const response = await fetch(PROXY_ENDPOINTS.products);
-    const data = await response.json();
-    handleData(data);
-  } catch (error) {
-    console.error('Error fetching data via proxy:', error);
-    showError('Failed to load data from server');
-  }
+        // Fetch data from Google Apps Script using JSONP
+function fetchDataFromGoogleSheets(callback) {
+    // Create a unique callback name
+    const callbackName = 'callback_' + new Date().getTime();
+    
+    // Create script element for JSONP
+    const script = document.createElement('script');
+    
+    // Add error handling attributes
+    script.crossOrigin = 'anonymous';
+    script.referrerPolicy = 'no-referrer';
+    
+    // Add timeout handling for mobile
+    const timeoutId = setTimeout(() => {
+        if (window[callbackName]) {
+            document.head.removeChild(script);
+            delete window[callbackName];
+        }
+        callback({
+            success: false,
+            message: 'Request timeout on mobile device'
+        });
+    }, 15000); // 15 second timeout for mobile
+    
+    script.src = `${PRODUCT_DATABASE_URL}?format=jsonp&callback=${callbackName}&t=${new Date().getTime()}&mobile=${isMobile ? 'yes' : 'no'}&v=1.0`;
+    
+    // Define the callback function
+    window[callbackName] = function(response) {
+        // Clean up
+        clearTimeout(timeoutId);
+        document.head.removeChild(script);
+        delete window[callbackName];
+        
+        callback(response);
+    };
+    
+    // Handle JSONP errors
+    script.onerror = function() {
+        clearTimeout(timeoutId);
+        if (document.head.contains(script)) {
+            document.head.removeChild(script);
+        }
+        delete window[callbackName];
+        
+        callback({
+            success: false,
+            message: 'Network error on mobile device. Please check connection.'
+        });
+    };
+    
+    // Add script to page
+    document.head.appendChild(script);
 }
 
 // Check network connectivity
@@ -3966,22 +4004,26 @@ if (customerPhone.includes(' ')) {
     }
 }     
 
-// Update order submission:
+// NEW FUNCTION: Send order data to Google Sheets
 async function sendOrderToGoogleSheets(orderData) {
-  try {
-    const response = await fetch(PROXY_ENDPOINTS.orders, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(orderData)
-    });
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error submitting order via proxy:', error);
-    throw error;
-  }
+    try {
+        const response = await fetch(ORDER_DATABASE_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Important for Google Apps Script
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        });
+        
+        // Note: With no-cors mode, we can't read the response
+        // But we assume it's successful if no network error
+        return { success: true };
+        
+    } catch (error) {
+        console.error('Error sending to Google Sheets:', error);
+        throw error;
+    }
 }
 
         // Toggle between grid and list view
