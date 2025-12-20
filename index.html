@@ -2462,13 +2462,12 @@ body.splash-active {
     </footer>
 
     <script>
-        // Your Apps Script URL
-        const PRODUCT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
-
-  const ORDER_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
-
-// AGENT FORM FUNCTIONS
-const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
+        // API endpoints pointing to YOUR Coolify server (not Google Apps Script directly)
+const API_BASE_URL = window.location.origin; // This will point to your Coolify server
+const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
+const ORDER_API_URL = `${API_BASE_URL}/api/orders`;
+const AGENT_API_URL = `${API_BASE_URL}/api/agents`;
+const ORDER_TRACKING_API_URL = `${API_BASE_URL}/api/orders`;
        
 
         // Global variables
@@ -3228,58 +3227,20 @@ function checkServiceWorkerIssues() {
     }
 }
 
-        // Fetch data from Google Apps Script using JSONP
 function fetchDataFromGoogleSheets(callback) {
-    // Create a unique callback name
-    const callbackName = 'callback_' + new Date().getTime();
-    
-    // Create script element for JSONP
-    const script = document.createElement('script');
-    
-    // Add error handling attributes
-    script.crossOrigin = 'anonymous';
-    script.referrerPolicy = 'no-referrer';
-    
-    // Add timeout handling for mobile
-    const timeoutId = setTimeout(() => {
-        if (window[callbackName]) {
-            document.head.removeChild(script);
-            delete window[callbackName];
-        }
-        callback({
-            success: false,
-            message: 'Request timeout on mobile device'
+    // Fetch data from YOUR Coolify server instead of directly from Google
+    fetch(PRODUCT_API_URL)
+        .then(response => response.json())
+        .then(data => {
+            callback(data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            callback({
+                success: false,
+                message: 'Failed to fetch data from server'
+            });
         });
-    }, 15000); // 15 second timeout for mobile
-    
-    script.src = `${PRODUCT_DATABASE_URL}?format=jsonp&callback=${callbackName}&t=${new Date().getTime()}&mobile=${isMobile ? 'yes' : 'no'}&v=1.0`;
-    
-    // Define the callback function
-    window[callbackName] = function(response) {
-        // Clean up
-        clearTimeout(timeoutId);
-        document.head.removeChild(script);
-        delete window[callbackName];
-        
-        callback(response);
-    };
-    
-    // Handle JSONP errors
-    script.onerror = function() {
-        clearTimeout(timeoutId);
-        if (document.head.contains(script)) {
-            document.head.removeChild(script);
-        }
-        delete window[callbackName];
-        
-        callback({
-            success: false,
-            message: 'Network error on mobile device. Please check connection.'
-        });
-    };
-    
-    // Add script to page
-    document.head.appendChild(script);
 }
 
 // Check network connectivity
@@ -4008,24 +3969,20 @@ if (customerPhone.includes(' ')) {
     }
 }     
 
-// NEW FUNCTION: Send order data to Google Sheets
 async function sendOrderToGoogleSheets(orderData) {
     try {
-        const response = await fetch(ORDER_DATABASE_URL, {
+        const response = await fetch(ORDER_API_URL, {
             method: 'POST',
-            mode: 'no-cors', // Important for Google Apps Script
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(orderData)
         });
         
-        // Note: With no-cors mode, we can't read the response
-        // But we assume it's successful if no network error
-        return { success: true };
-        
+        const data = await response.json();
+        return data;
     } catch (error) {
-        console.error('Error sending to Google Sheets:', error);
+        console.error('Error sending to server:', error);
         throw error;
     }
 }
@@ -4597,30 +4554,18 @@ async function handleAgentSubmit(event) {
     }
 }
 
-// Submit agent form to Google Apps Script
 async function submitAgentForm(formData) {
     try {
-        // Create URL with query parameters
-        const url = new URL(AGENT_DATABASE_URL);
-        url.searchParams.append('agentId', formData.agentId);
-        url.searchParams.append('name', formData.name);
-        url.searchParams.append('phone', formData.phone);
-        url.searchParams.append('email', formData.email);
-        url.searchParams.append('address', formData.address);
-        
-        const response = await fetch(url, {
+        const response = await fetch(AGENT_API_URL, {
             method: 'POST',
-            mode: 'no-cors', // Google Apps Script requires no-cors for POST
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(formData)
         });
         
-        // Note: With no-cors mode, we can't read the response
-        // But we assume it's successful if no network error
-        return { success: true };
-        
+        const data = await response.json();
+        return data;
     } catch (error) {
         console.error('Agent form submission error:', error);
         throw new Error('Network error. Please check your connection and try again.');
@@ -4688,7 +4633,7 @@ async function trackOrder(orderId) {
     
     try {
         // Fetch order data from Google Sheets
-        const response = await fetch(`${ORDER_DATABASE_URL}?orderId=${encodeURIComponent(orderId)}`);
+        const response = await fetch(`${ORDER_TRACKING_API_URL}/${encodeURIComponent(orderId)}`);
         
         if (!response.ok) {
             throw new Error('Failed to fetch order data');
@@ -4830,4 +4775,3 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
-
