@@ -1,4 +1,4 @@
-// server.js - Updated with proper data parsing
+// server.js - Simple backend proxy to hide Google Apps Script URLs
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -8,27 +8,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Your environment variables
+// Your environment variables (will be set in Coolify)
 const PRODUCT_DATABASE_URL = process.env.PRODUCT_DATABASE_URL;
 const ORDER_DATABASE_URL = process.env.ORDER_DATABASE_URL;
 const AGENT_DATABASE_URL = process.env.AGENT_DATABASE_URL;
 
-// Helper function to convert Google Sheets array data to objects
-function convertSheetDataToObjects(sheetData) {
-    if (!Array.isArray(sheetData) || sheetData.length === 0) {
-        return [];
+// Helper function to parse JSONP response
+function parseJsonpResponse(text) {
+    try {
+        const jsonpMatch = text.match(/tempCallback\((.*)\)/);
+        if (jsonpMatch) {
+            return JSON.parse(jsonpMatch[1]);
+        }
+        // Try to parse as regular JSON
+        return JSON.parse(text);
+    } catch (error) {
+        console.error('Failed to parse response:', error);
+        return null;
     }
-    
-    const headers = sheetData[0].map(h => h.trim()); // Trim header names
-    const rows = sheetData.slice(1);
-    
-    return rows.map(row => {
-        const obj = {};
-        headers.forEach((header, index) => {
-            obj[header] = row[index] || '';
-        });
-        return obj;
-    });
 }
 
 // Proxy endpoint for product data
@@ -37,13 +34,11 @@ app.get('/api/products', async (req, res) => {
         const response = await fetch(`${PRODUCT_DATABASE_URL}?format=jsonp&callback=tempCallback&t=${Date.now()}`);
         const text = await response.text();
         
-        // Extract JSON from JSONP response
-        const jsonpMatch = text.match(/tempCallback\((.*)\)/);
-        if (jsonpMatch) {
-            const jsonData = JSON.parse(jsonpMatch[1]);
+        const jsonData = parseJsonpResponse(text);
+        if (jsonData) {
             res.json(jsonData);
         } else {
-            res.json({ success: false, message: "Invalid JSONP response" });
+            res.json({ success: false, message: "Invalid response from products API" });
         }
     } catch (error) {
         console.error('Error fetching products:', error);
@@ -51,34 +46,23 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// Proxy endpoint for getting all orders - FIXED
+// Proxy endpoint for getting all orders
 app.get('/api/orders', async (req, res) => {
     try {
         const response = await fetch(ORDER_DATABASE_URL);
         const result = await response.json();
         
-        // Check if data is already in object format
+        // Return EXACTLY what the original code expects
+        // The original code expects: {success: true, data: Array(8)}
+        // where data[0] = headers, data[1+] = rows
         if (result.success && Array.isArray(result.data)) {
-            if (result.data.length > 0 && typeof result.data[0] === 'object') {
-                // Already array of objects
-                res.json({
-                    success: true,
-                    data: result.data,
-                    total: result.data.length,
-                    timestamp: new Date().toISOString()
-                });
-            } else {
-                // Array of arrays - need to convert
-                const parsedData = convertSheetDataToObjects(result.data);
-                res.json({
-                    success: true,
-                    data: parsedData,
-                    total: parsedData.length,
-                    timestamp: new Date().toISOString()
-                });
-            }
+            res.json(result);
         } else {
-            res.json({ success: false, message: result.message || 'Invalid data format' });
+            // Try to wrap it in the expected format
+            res.json({
+                success: true,
+                data: Array.isArray(result) ? result : [result]
+            });
         }
     } catch (error) {
         console.error('Error fetching orders:', error);
@@ -86,34 +70,23 @@ app.get('/api/orders', async (req, res) => {
     }
 });
 
-// Proxy endpoint for getting agent data - FIXED
+// Proxy endpoint for getting agent data
 app.get('/api/agents', async (req, res) => {
     try {
         const response = await fetch(AGENT_DATABASE_URL);
         const result = await response.json();
         
-        // Check if data is already in object format
+        // Return EXACTLY what the original code expects
+        // The original code expects: {success: true, data: Array(6)}
+        // where data[0] = headers, data[1+] = rows
         if (result.success && Array.isArray(result.data)) {
-            if (result.data.length > 0 && typeof result.data[0] === 'object') {
-                // Already array of objects
-                res.json({
-                    success: true,
-                    data: result.data,
-                    total: result.data.length,
-                    timestamp: new Date().toISOString()
-                });
-            } else {
-                // Array of arrays - need to convert
-                const parsedData = convertSheetDataToObjects(result.data);
-                res.json({
-                    success: true,
-                    data: parsedData,
-                    total: parsedData.length,
-                    timestamp: new Date().toISOString()
-                });
-            }
+            res.json(result);
         } else {
-            res.json({ success: false, message: result.message || 'Invalid data format' });
+            // Try to wrap it in the expected format
+            res.json({
+                success: true,
+                data: Array.isArray(result) ? result : [result]
+            });
         }
     } catch (error) {
         console.error('Error fetching agents:', error);
