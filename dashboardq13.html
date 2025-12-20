@@ -1392,10 +1392,11 @@
     </div>
 
     <script>
-        // URLs for Google Apps Script Web Apps
-        const ORDER_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
-        const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
-        const PRODUCT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
+        // API endpoints pointing to YOUR Coolify server
+const API_BASE_URL = window.location.origin;
+const ORDER_API_URL = `${API_BASE_URL}/api/orders`;
+const AGENT_API_URL = `${API_BASE_URL}/api/agents`;
+const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
 
         // Global variables for data
         let ordersData = [];
@@ -1513,7 +1514,7 @@
         async function fetchOrdersData() {
             try {
                 console.log('Fetching orders data from:', ORDER_DATABASE_URL);
-                const response = await fetch(ORDER_DATABASE_URL);
+                const response = await fetch(ORDER_API_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1548,7 +1549,7 @@
         async function fetchAgentsData() {
             try {
                 console.log('Fetching agents data from:', AGENT_DATABASE_URL);
-                const response = await fetch(AGENT_DATABASE_URL);
+                const response = await fetch(AGENT_API_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1585,7 +1586,7 @@
         async function fetchProductsData() {
             try {
                 console.log('Fetching products data from:', PRODUCT_DATABASE_URL);
-                const response = await fetch(PRODUCT_DATABASE_URL);
+                const response = await fetch(PRODUCT_API_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -2097,7 +2098,7 @@
 
 async function editOrder(billCode) {
     try {
-        const response = await fetch(`${ORDER_DATABASE_URL}?orderId=${encodeURIComponent(billCode)}`);
+        const response = await fetch(`${ORDER_API_URL}/${encodeURIComponent(billCode)}`);
         const result = await response.json();
 
         console.log('Edit Order Response:', result);
@@ -2195,7 +2196,7 @@ document.getElementById('editOrderForm').addEventListener('submit', async functi
     }
     
     try {
-        const response = await fetch(ORDER_DATABASE_URL, {
+        const response = await fetch(ORDER_API_URL, {
             method: 'POST',
             body: JSON.stringify(orderData)
         });
@@ -2228,7 +2229,7 @@ async function confirmDeleteOrder() {
     }
     
     try {
-        const response = await fetch(ORDER_DATABASE_URL, {
+        const response = await fetch(ORDER_API_URL, {
             method: 'POST',
             body: JSON.stringify({
                 action: 'deleteOrder',
@@ -2387,7 +2388,7 @@ function deleteAgent(agentId) {
             };
             
             try {
-                const response = await fetch(PRODUCT_DATABASE_URL, {
+                const response = await fetch(PRODUCT_API_URL, {
                     method: 'POST',
                     body: JSON.stringify(formData)
                 });
@@ -2415,7 +2416,7 @@ function deleteAgent(agentId) {
             const productCode = document.getElementById('delete-product-code').value;
             
             try {
-                const response = await fetch(PRODUCT_DATABASE_URL, {
+                const response = await fetch(PRODUCT_API_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'delete',
@@ -2514,7 +2515,7 @@ async function handleAddProductSubmit(e) {
     }
     
     try {
-        const response = await fetch(PRODUCT_DATABASE_URL, {
+        const response = await fetch(PRODUCT_API_URL, {
             method: 'POST',
             body: JSON.stringify(productData)
         });
@@ -2586,7 +2587,7 @@ document.getElementById('addAgentForm').addEventListener('submit', async functio
     }
     
     try {
-        const response = await fetch(AGENT_DATABASE_URL, {
+        const response = await fetch(AGENT_API_URL, {
             method: 'POST',
             body: JSON.stringify(agentData)
         });
@@ -2631,7 +2632,7 @@ document.getElementById('editAgentForm').addEventListener('submit', async functi
     }
     
     try {
-        const response = await fetch(AGENT_DATABASE_URL, {
+        const response = await fetch(AGENT_API_URL, {
             method: 'POST',
             body: JSON.stringify(agentData)
         });
@@ -2664,7 +2665,7 @@ async function confirmDeleteAgent() {
     }
     
     try {
-        const response = await fetch(AGENT_DATABASE_URL, {
+        const response = await fetch(AGENT_API_URL, {
             method: 'POST',
             body: JSON.stringify({
                 action: 'delete',
