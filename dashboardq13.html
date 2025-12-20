@@ -1510,7 +1510,7 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
             }, 10000);
         }
 
-      // Function to fetch orders data - SIMPLIFIED
+// Function to fetch orders data - UPDATED to match original
 async function fetchOrdersData() {
     try {
         console.log('Fetching orders data from:', ORDER_API_URL);
@@ -1524,7 +1524,18 @@ async function fetchOrdersData() {
         console.log('Orders API response:', result);
         
         if (result.success && Array.isArray(result.data)) {
-            return result.data; // Server already parsed it
+            // The first row is headers, so skip it
+            const headers = result.data[0];
+            const rows = result.data.slice(1);
+            
+            // Convert rows to objects with header keys (like original code)
+            return rows.map(row => {
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index] || '';
+                });
+                return obj;
+            });
         } else {
             throw new Error(result.message || 'Invalid data format from orders API');
         }
@@ -1534,7 +1545,7 @@ async function fetchOrdersData() {
     }
 }
 
-// Function to fetch agents data - SIMPLIFIED
+// Function to fetch agents data - UPDATED to match original
 async function fetchAgentsData() {
     try {
         console.log('Fetching agents data from:', AGENT_API_URL);
@@ -1548,7 +1559,20 @@ async function fetchAgentsData() {
         console.log('Agents API response:', result);
         
         if (result.success && Array.isArray(result.data)) {
-            return result.data; // Server already parsed it
+            // The first row is headers, so skip it
+            const headers = result.data[0];
+            const rows = result.data.slice(1);
+            
+            // Convert rows to objects with header keys (like original code)
+            return rows.map(row => {
+                const obj = {};
+                headers.forEach((header, index) => {
+                    // Fix: Trim header names to remove trailing spaces
+                    const cleanHeader = header.trim();
+                    obj[cleanHeader] = row[index] || '';
+                });
+                return obj;
+            });
         } else {
             throw new Error(result.message || 'Invalid data format from agents API');
         }
@@ -2652,5 +2676,6 @@ async function confirmDeleteAgent() {
     </script>
 </body>
 </html>
+
 
 
