@@ -1394,10 +1394,10 @@
     <script>
         // API endpoints pointing to YOUR Coolify server
 const API_BASE_URL = window.location.origin;
-const ORDER_API_URL = `${API_BASE_URL}/api/orders`;
-const AGENT_API_URL = `${API_BASE_URL}/api/agents`;
-const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
-
+const ORDER_API_URL = `/api/orders`;
+const AGENT_API_URL = `/api/agents`;
+const PRODUCT_API_URL = `/api/products`;
+        
         // Global variables for data
         let ordersData = [];
         let agentsData = [];
@@ -2676,6 +2676,7 @@ async function confirmDeleteAgent() {
     </script>
 </body>
 </html>
+
 
 
 
