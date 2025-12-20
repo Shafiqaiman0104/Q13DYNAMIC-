@@ -1,4 +1,4 @@
-// server.js - Simple backend proxy to hide Google Apps Script URLs
+// server.js - Updated with proper data parsing
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -8,10 +8,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Your environment variables (will be set in Coolify)
+// Your environment variables
 const PRODUCT_DATABASE_URL = process.env.PRODUCT_DATABASE_URL;
 const ORDER_DATABASE_URL = process.env.ORDER_DATABASE_URL;
 const AGENT_DATABASE_URL = process.env.AGENT_DATABASE_URL;
+
+// Helper function to convert Google Sheets array data to objects
+function convertSheetDataToObjects(sheetData) {
+    if (!Array.isArray(sheetData) || sheetData.length === 0) {
+        return [];
+    }
+    
+    const headers = sheetData[0].map(h => h.trim()); // Trim header names
+    const rows = sheetData.slice(1);
+    
+    return rows.map(row => {
+        const obj = {};
+        headers.forEach((header, index) => {
+            obj[header] = row[index] || '';
+        });
+        return obj;
+    });
+}
 
 // Proxy endpoint for product data
 app.get('/api/products', async (req, res) => {
@@ -33,24 +51,70 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// Proxy endpoint for getting all orders
+// Proxy endpoint for getting all orders - FIXED
 app.get('/api/orders', async (req, res) => {
     try {
         const response = await fetch(ORDER_DATABASE_URL);
-        const data = await response.json();
-        res.json(data);
+        const result = await response.json();
+        
+        // Check if data is already in object format
+        if (result.success && Array.isArray(result.data)) {
+            if (result.data.length > 0 && typeof result.data[0] === 'object') {
+                // Already array of objects
+                res.json({
+                    success: true,
+                    data: result.data,
+                    total: result.data.length,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                // Array of arrays - need to convert
+                const parsedData = convertSheetDataToObjects(result.data);
+                res.json({
+                    success: true,
+                    data: parsedData,
+                    total: parsedData.length,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        } else {
+            res.json({ success: false, message: result.message || 'Invalid data format' });
+        }
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// Proxy endpoint for getting agent data
+// Proxy endpoint for getting agent data - FIXED
 app.get('/api/agents', async (req, res) => {
     try {
         const response = await fetch(AGENT_DATABASE_URL);
-        const data = await response.json();
-        res.json(data);
+        const result = await response.json();
+        
+        // Check if data is already in object format
+        if (result.success && Array.isArray(result.data)) {
+            if (result.data.length > 0 && typeof result.data[0] === 'object') {
+                // Already array of objects
+                res.json({
+                    success: true,
+                    data: result.data,
+                    total: result.data.length,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                // Array of arrays - need to convert
+                const parsedData = convertSheetDataToObjects(result.data);
+                res.json({
+                    success: true,
+                    data: parsedData,
+                    total: parsedData.length,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        } else {
+            res.json({ success: false, message: result.message || 'Invalid data format' });
+        }
     } catch (error) {
         console.error('Error fetching agents:', error);
         res.status(500).json({ success: false, message: error.message });
