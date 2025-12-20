@@ -1392,12 +1392,11 @@
     </div>
 
     <script>
-        // API endpoints pointing to YOUR Coolify server
-const API_BASE_URL = window.location.origin;
-const ORDER_API_URL = `/api/orders`;
-const AGENT_API_URL = `/api/agents`;
-const PRODUCT_API_URL = `/api/products`;
-        
+        // URLs for Google Apps Script Web Apps
+        const ORDER_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec';
+        const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
+        const PRODUCT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbz1tnkvEKaOIi2k76YVws_OiItN8LJ_EMtv1VPkghOu71NJwlCDEBocIw2sneQE7xSRZQ/exec';
+
         // Global variables for data
         let ordersData = [];
         let agentsData = [];
@@ -1510,102 +1509,119 @@ const PRODUCT_API_URL = `/api/products`;
             }, 10000);
         }
 
-// Function to fetch orders data - UPDATED to match original
-async function fetchOrdersData() {
-    try {
-        console.log('Fetching orders data from:', ORDER_API_URL);
-        const response = await fetch(ORDER_API_URL);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        // Function to fetch orders data
+        async function fetchOrdersData() {
+            try {
+                console.log('Fetching orders data from:', ORDER_DATABASE_URL);
+                const response = await fetch(ORDER_DATABASE_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('Orders API response:', result);
+                
+                if (result.success && Array.isArray(result.data)) {
+                    // The first row is headers, so skip it
+                    const headers = result.data[0];
+                    const rows = result.data.slice(1);
+                    
+                    // Convert rows to objects with header keys
+                    return rows.map(row => {
+                        const obj = {};
+                        headers.forEach((header, index) => {
+                            obj[header] = row[index] || '';
+                        });
+                        return obj;
+                    });
+                } else {
+                    throw new Error(result.message || 'Invalid data format from orders API');
+                }
+            } catch (error) {
+                console.error('Error fetching orders data:', error);
+                throw error;
+            }
         }
-        
-        const result = await response.json();
-        console.log('Orders API response:', result);
-        
-        if (result.success && Array.isArray(result.data)) {
-            // The first row is headers, so skip it
-            const headers = result.data[0];
-            const rows = result.data.slice(1);
-            
-            // Convert rows to objects with header keys (like original code)
-            return rows.map(row => {
-                const obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = row[index] || '';
-                });
-                return obj;
-            });
-        } else {
-            throw new Error(result.message || 'Invalid data format from orders API');
-        }
-    } catch (error) {
-        console.error('Error fetching orders data:', error);
-        throw error;
-    }
-}
 
-// Function to fetch agents data - UPDATED to match original
-async function fetchAgentsData() {
-    try {
-        console.log('Fetching agents data from:', AGENT_API_URL);
-        const response = await fetch(AGENT_API_URL);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        // Function to fetch agents data - FIXED for email space issue
+        async function fetchAgentsData() {
+            try {
+                console.log('Fetching agents data from:', AGENT_DATABASE_URL);
+                const response = await fetch(AGENT_DATABASE_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('Agents API response:', result);
+                
+                if (result.success && Array.isArray(result.data)) {
+                    // The first row is headers, so skip it
+                    const headers = result.data[0];
+                    const rows = result.data.slice(1);
+                    
+                    // Convert rows to objects with header keys
+                    return rows.map(row => {
+                        const obj = {};
+                        headers.forEach((header, index) => {
+                            // Fix: Trim header names to remove trailing spaces
+                            const cleanHeader = header.trim();
+                            obj[cleanHeader] = row[index] || '';
+                        });
+                        return obj;
+                    });
+                } else {
+                    throw new Error(result.message || 'Invalid data format from agents API');
+                }
+            } catch (error) {
+                console.error('Error fetching agents data:', error);
+                throw error;
+            }
         }
-        
-        const result = await response.json();
-        console.log('Agents API response:', result);
-        
-        if (result.success && Array.isArray(result.data)) {
-            // The first row is headers, so skip it
-            const headers = result.data[0];
-            const rows = result.data.slice(1);
-            
-            // Convert rows to objects with header keys (like original code)
-            return rows.map(row => {
-                const obj = {};
-                headers.forEach((header, index) => {
-                    // Fix: Trim header names to remove trailing spaces
-                    const cleanHeader = header.trim();
-                    obj[cleanHeader] = row[index] || '';
-                });
-                return obj;
-            });
-        } else {
-            throw new Error(result.message || 'Invalid data format from agents API');
-        }
-    } catch (error) {
-        console.error('Error fetching agents data:', error);
-        throw error;
-    }
-}
 
-// Function to fetch products data
-async function fetchProductsData() {
-    try {
-        console.log('Fetching products data from:', PRODUCT_API_URL);
-        const response = await fetch(PRODUCT_API_URL);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        // Function to fetch products data
+        async function fetchProductsData() {
+            try {
+                console.log('Fetching products data from:', PRODUCT_DATABASE_URL);
+                const response = await fetch(PRODUCT_DATABASE_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('Products API response:', result);
+                
+                // The product API has a different structure
+                if (result.success && Array.isArray(result.data)) {
+                    // If data is already an array of objects
+                    if (result.data.length > 0 && typeof result.data[0] === 'object') {
+                        return result.data;
+                    }
+                    // If data is array of arrays (with headers)
+                    else if (Array.isArray(result.data[0])) {
+                        const headers = result.data[0];
+                        const rows = result.data.slice(1);
+                        
+                        // Convert rows to objects with header keys
+                        return rows.map(row => {
+                            const obj = {};
+                            headers.forEach((header, index) => {
+                                obj[header] = row[index] || '';
+                            });
+                            return obj;
+                        });
+                    }
+                }
+                
+                throw new Error('Invalid data format from products API');
+            } catch (error) {
+                console.error('Error fetching products data:', error);
+                throw error;
+            }
         }
-        
-        const result = await response.json();
-        console.log('Products API response:', result);
-        
-        // The proxy returns the data directly
-        if (result.success && Array.isArray(result.data)) {
-            return result.data;
-        }
-        
-        throw new Error('Invalid data format from products API');
-    } catch (error) {
-        console.error('Error fetching products data:', error);
-        throw error;
-    }
-}        
 
         // Update dashboard statistics
         function updateDashboardStats() {
@@ -2081,7 +2097,7 @@ async function fetchProductsData() {
 
 async function editOrder(billCode) {
     try {
-        const response = await fetch(`${ORDER_API_URL}/${encodeURIComponent(billCode)}`);
+        const response = await fetch(`${ORDER_DATABASE_URL}?orderId=${encodeURIComponent(billCode)}`);
         const result = await response.json();
 
         console.log('Edit Order Response:', result);
@@ -2179,7 +2195,7 @@ document.getElementById('editOrderForm').addEventListener('submit', async functi
     }
     
     try {
-        const response = await fetch(ORDER_API_URL, {
+        const response = await fetch(ORDER_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(orderData)
         });
@@ -2212,7 +2228,7 @@ async function confirmDeleteOrder() {
     }
     
     try {
-        const response = await fetch(ORDER_API_URL, {
+        const response = await fetch(ORDER_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify({
                 action: 'deleteOrder',
@@ -2371,7 +2387,7 @@ function deleteAgent(agentId) {
             };
             
             try {
-                const response = await fetch(PRODUCT_API_URL, {
+                const response = await fetch(PRODUCT_DATABASE_URL, {
                     method: 'POST',
                     body: JSON.stringify(formData)
                 });
@@ -2399,7 +2415,7 @@ function deleteAgent(agentId) {
             const productCode = document.getElementById('delete-product-code').value;
             
             try {
-                const response = await fetch(PRODUCT_API_URL, {
+                const response = await fetch(PRODUCT_DATABASE_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'delete',
@@ -2498,7 +2514,7 @@ async function handleAddProductSubmit(e) {
     }
     
     try {
-        const response = await fetch(PRODUCT_API_URL, {
+        const response = await fetch(PRODUCT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(productData)
         });
@@ -2570,7 +2586,7 @@ document.getElementById('addAgentForm').addEventListener('submit', async functio
     }
     
     try {
-        const response = await fetch(AGENT_API_URL, {
+        const response = await fetch(AGENT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(agentData)
         });
@@ -2615,7 +2631,7 @@ document.getElementById('editAgentForm').addEventListener('submit', async functi
     }
     
     try {
-        const response = await fetch(AGENT_API_URL, {
+        const response = await fetch(AGENT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify(agentData)
         });
@@ -2648,7 +2664,7 @@ async function confirmDeleteAgent() {
     }
     
     try {
-        const response = await fetch(AGENT_API_URL, {
+        const response = await fetch(AGENT_DATABASE_URL, {
             method: 'POST',
             body: JSON.stringify({
                 action: 'delete',
@@ -2676,7 +2692,3 @@ async function confirmDeleteAgent() {
     </script>
 </body>
 </html>
-
-
-
-
