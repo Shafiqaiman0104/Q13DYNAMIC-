@@ -1,4 +1,4 @@
-// server.js - Simple backend proxy to hide Google Apps Script URLs
+// server.js - Complete backend proxy with all CRUD operations
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -28,7 +28,30 @@ function parseJsonpResponse(text) {
     }
 }
 
-// Proxy endpoint for product data
+// Helper function to make POST requests
+async function makeGoogleAppsScriptRequest(url, body) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        
+        // Check if response is JSON or JSONP
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch {
+            return parseJsonpResponse(text) || { success: true, message: text };
+        }
+    } catch (error) {
+        console.error('Error making request to Google Apps Script:', error);
+        throw error;
+    }
+}
+
+// ========== PRODUCTS ENDPOINTS ==========
+// GET all products
 app.get('/api/products', async (req, res) => {
     try {
         const response = await fetch(`${PRODUCT_DATABASE_URL}?format=jsonp&callback=tempCallback&t=${Date.now()}`);
@@ -46,19 +69,43 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// Proxy endpoint for getting all orders
+// POST product operations (add, update, delete)
+app.post('/api/products', async (req, res) => {
+    try {
+        console.log('Product operation requested:', req.body);
+        const result = await makeGoogleAppsScriptRequest(PRODUCT_DATABASE_URL, req.body);
+        res.json(result);
+    } catch (error) {
+        console.error('Error with product operation:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// GET product by code (if needed)
+app.get('/api/products/:productCode', async (req, res) => {
+    try {
+        const { productCode } = req.params;
+        const response = await fetch(`${PRODUCT_DATABASE_URL}?code=${encodeURIComponent(productCode)}`);
+        const text = await response.text();
+        
+        const jsonData = parseJsonpResponse(text) || JSON.parse(text);
+        res.json(jsonData);
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// ========== ORDERS ENDPOINTS ==========
+// GET all orders
 app.get('/api/orders', async (req, res) => {
     try {
         const response = await fetch(ORDER_DATABASE_URL);
         const result = await response.json();
         
-        // Return EXACTLY what the original code expects
-        // The original code expects: {success: true, data: Array(8)}
-        // where data[0] = headers, data[1+] = rows
         if (result.success && Array.isArray(result.data)) {
             res.json(result);
         } else {
-            // Try to wrap it in the expected format
             res.json({
                 success: true,
                 data: Array.isArray(result) ? result : [result]
@@ -70,19 +117,41 @@ app.get('/api/orders', async (req, res) => {
     }
 });
 
-// Proxy endpoint for getting agent data
+// POST order operations (update, delete)
+app.post('/api/orders', async (req, res) => {
+    try {
+        console.log('Order operation requested:', req.body);
+        const result = await makeGoogleAppsScriptRequest(ORDER_DATABASE_URL, req.body);
+        res.json(result);
+    } catch (error) {
+        console.error('Error with order operation:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// GET order by ID
+app.get('/api/orders/:orderId', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const response = await fetch(`${ORDER_DATABASE_URL}?orderId=${encodeURIComponent(orderId)}`);
+        const result = await response.json();
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching order:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// ========== AGENTS ENDPOINTS ==========
+// GET all agents
 app.get('/api/agents', async (req, res) => {
     try {
         const response = await fetch(AGENT_DATABASE_URL);
         const result = await response.json();
         
-        // Return EXACTLY what the original code expects
-        // The original code expects: {success: true, data: Array(6)}
-        // where data[0] = headers, data[1+] = rows
         if (result.success && Array.isArray(result.data)) {
             res.json(result);
         } else {
-            // Try to wrap it in the expected format
             res.json({
                 success: true,
                 data: Array.isArray(result) ? result : [result]
@@ -94,47 +163,14 @@ app.get('/api/agents', async (req, res) => {
     }
 });
 
-// Proxy endpoint for submitting orders
-app.post('/api/orders', async (req, res) => {
-    try {
-        const response = await fetch(ORDER_DATABASE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(req.body)
-        });
-        const data = await response.text();
-        res.send(data);
-    } catch (error) {
-        console.error('Error submitting order:', error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
-
-// Proxy endpoint for agents
+// POST agent operations (add, update, delete)
 app.post('/api/agents', async (req, res) => {
     try {
-        const response = await fetch(AGENT_DATABASE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(req.body)
-        });
-        const data = await response.text();
-        res.send(data);
+        console.log('Agent operation requested:', req.body);
+        const result = await makeGoogleAppsScriptRequest(AGENT_DATABASE_URL, req.body);
+        res.json(result);
     } catch (error) {
-        console.error('Error with agents:', error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
-
-// Proxy endpoint for getting order by ID (for tracking)
-app.get('/api/orders/:orderId', async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const response = await fetch(`${ORDER_DATABASE_URL}?orderId=${encodeURIComponent(orderId)}`);
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error fetching order:', error);
+        console.error('Error with agent operation:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
@@ -146,4 +182,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log('API URLs loaded from environment variables');
+    console.log(`Product API: ${PRODUCT_DATABASE_URL ? 'Loaded' : 'Not loaded'}`);
+    console.log(`Order API: ${ORDER_DATABASE_URL ? 'Loaded' : 'Not loaded'}`);
+    console.log(`Agent API: ${AGENT_DATABASE_URL ? 'Loaded' : 'Not loaded'}`);
 });
