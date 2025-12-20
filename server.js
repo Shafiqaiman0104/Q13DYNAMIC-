@@ -33,6 +33,46 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
+// Add this to server.js - Proxy endpoint for getting agent data
+app.get('/api/agents', async (req, res) => {
+    try {
+        const response = await fetch(`${AGENT_DATABASE_URL}?format=jsonp&callback=tempCallback&t=${Date.now()}`);
+        const text = await response.text();
+        
+        // Extract JSON from JSONP response
+        const jsonpMatch = text.match(/tempCallback\((.*)\)/);
+        if (jsonpMatch) {
+            const jsonData = JSON.parse(jsonpMatch[1]);
+            res.json(jsonData);
+        } else {
+            res.json({ success: false, message: "Invalid JSONP response" });
+        }
+    } catch (error) {
+        console.error('Error fetching agents:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Add this to server.js - Proxy endpoint for getting all orders
+app.get('/api/orders', async (req, res) => {
+    try {
+        const response = await fetch(`${ORDER_DATABASE_URL}?format=jsonp&callback=tempCallback&t=${Date.now()}`);
+        const text = await response.text();
+        
+        // Extract JSON from JSONP response
+        const jsonpMatch = text.match(/tempCallback\((.*)\)/);
+        if (jsonpMatch) {
+            const jsonData = JSON.parse(jsonpMatch[1]);
+            res.json(jsonData);
+        } else {
+            res.json({ success: false, message: "Invalid JSONP response" });
+        }
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // Proxy endpoint for submitting orders
 app.post('/api/orders', async (req, res) => {
     try {
