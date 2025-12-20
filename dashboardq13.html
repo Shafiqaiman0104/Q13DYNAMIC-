@@ -1510,11 +1510,11 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
             }, 10000);
         }
 
-        // Function to fetch orders data
+      // Function to fetch orders data - SIMPLIFIED
 async function fetchOrdersData() {
     try {
         console.log('Fetching orders data from:', ORDER_API_URL);
-        const response = await fetch(ORDER_API_URL);  // Changed from PRODUCT_API_URL
+        const response = await fetch(ORDER_API_URL);
         
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1523,9 +1523,8 @@ async function fetchOrdersData() {
         const result = await response.json();
         console.log('Orders API response:', result);
         
-        // The proxy returns the data directly, not with headers/rows structure
         if (result.success && Array.isArray(result.data)) {
-            return result.data;  // Directly return the data array
+            return result.data; // Server already parsed it
         } else {
             throw new Error(result.message || 'Invalid data format from orders API');
         }
@@ -1535,11 +1534,11 @@ async function fetchOrdersData() {
     }
 }
 
-        // Function to fetch agents data - FIXED for email space issue
+// Function to fetch agents data - SIMPLIFIED
 async function fetchAgentsData() {
     try {
         console.log('Fetching agents data from:', AGENT_API_URL);
-        const response = await fetch(AGENT_API_URL);  // Changed from PRODUCT_API_URL
+        const response = await fetch(AGENT_API_URL);
         
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1548,9 +1547,8 @@ async function fetchAgentsData() {
         const result = await response.json();
         console.log('Agents API response:', result);
         
-        // The proxy returns the data directly, not with headers/rows structure
         if (result.success && Array.isArray(result.data)) {
-            return result.data;  // Directly return the data array
+            return result.data; // Server already parsed it
         } else {
             throw new Error(result.message || 'Invalid data format from agents API');
         }
@@ -2654,4 +2652,5 @@ async function confirmDeleteAgent() {
     </script>
 </body>
 </html>
+
 
