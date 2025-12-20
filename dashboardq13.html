@@ -1514,7 +1514,7 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
         async function fetchOrdersData() {
             try {
                 console.log('Fetching orders data from:', ORDER_API_URL);
-                const response = await fetch(ORDER_API_URL);
+                const response = await fetch(PRODUCT_API_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1549,7 +1549,7 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
         async function fetchAgentsData() {
             try {
                 console.log('Fetching agents data from:', AGENT_API_URL);
-                const response = await fetch(AGENT_API_URL);
+                const response = await fetch(PRODUCT_API_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -2693,4 +2693,5 @@ async function confirmDeleteAgent() {
     </script>
 </body>
 </html>
+
 
