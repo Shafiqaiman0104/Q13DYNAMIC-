@@ -1511,118 +1511,79 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
         }
 
         // Function to fetch orders data
-        async function fetchOrdersData() {
-            try {
-                console.log('Fetching orders data from:', ORDER_API_URL);
-                const response = await fetch(PRODUCT_API_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                console.log('Orders API response:', result);
-                
-                if (result.success && Array.isArray(result.data)) {
-                    // The first row is headers, so skip it
-                    const headers = result.data[0];
-                    const rows = result.data.slice(1);
-                    
-                    // Convert rows to objects with header keys
-                    return rows.map(row => {
-                        const obj = {};
-                        headers.forEach((header, index) => {
-                            obj[header] = row[index] || '';
-                        });
-                        return obj;
-                    });
-                } else {
-                    throw new Error(result.message || 'Invalid data format from orders API');
-                }
-            } catch (error) {
-                console.error('Error fetching orders data:', error);
-                throw error;
-            }
+async function fetchOrdersData() {
+    try {
+        console.log('Fetching orders data from:', ORDER_API_URL);
+        const response = await fetch(ORDER_API_URL);  // Changed from PRODUCT_API_URL
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        console.log('Orders API response:', result);
+        
+        // The proxy returns the data directly, not with headers/rows structure
+        if (result.success && Array.isArray(result.data)) {
+            return result.data;  // Directly return the data array
+        } else {
+            throw new Error(result.message || 'Invalid data format from orders API');
+        }
+    } catch (error) {
+        console.error('Error fetching orders data:', error);
+        throw error;
+    }
+}
 
         // Function to fetch agents data - FIXED for email space issue
-        async function fetchAgentsData() {
-            try {
-                console.log('Fetching agents data from:', AGENT_API_URL);
-                const response = await fetch(PRODUCT_API_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                console.log('Agents API response:', result);
-                
-                if (result.success && Array.isArray(result.data)) {
-                    // The first row is headers, so skip it
-                    const headers = result.data[0];
-                    const rows = result.data.slice(1);
-                    
-                    // Convert rows to objects with header keys
-                    return rows.map(row => {
-                        const obj = {};
-                        headers.forEach((header, index) => {
-                            // Fix: Trim header names to remove trailing spaces
-                            const cleanHeader = header.trim();
-                            obj[cleanHeader] = row[index] || '';
-                        });
-                        return obj;
-                    });
-                } else {
-                    throw new Error(result.message || 'Invalid data format from agents API');
-                }
-            } catch (error) {
-                console.error('Error fetching agents data:', error);
-                throw error;
-            }
+async function fetchAgentsData() {
+    try {
+        console.log('Fetching agents data from:', AGENT_API_URL);
+        const response = await fetch(AGENT_API_URL);  // Changed from PRODUCT_API_URL
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        console.log('Agents API response:', result);
+        
+        // The proxy returns the data directly, not with headers/rows structure
+        if (result.success && Array.isArray(result.data)) {
+            return result.data;  // Directly return the data array
+        } else {
+            throw new Error(result.message || 'Invalid data format from agents API');
+        }
+    } catch (error) {
+        console.error('Error fetching agents data:', error);
+        throw error;
+    }
+}
 
-        // Function to fetch products data
-        async function fetchProductsData() {
-            try {
-                console.log('Fetching products data from:', PRODUCT_API_URL);
-                const response = await fetch(PRODUCT_API_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                console.log('Products API response:', result);
-                
-                // The product API has a different structure
-                if (result.success && Array.isArray(result.data)) {
-                    // If data is already an array of objects
-                    if (result.data.length > 0 && typeof result.data[0] === 'object') {
-                        return result.data;
-                    }
-                    // If data is array of arrays (with headers)
-                    else if (Array.isArray(result.data[0])) {
-                        const headers = result.data[0];
-                        const rows = result.data.slice(1);
-                        
-                        // Convert rows to objects with header keys
-                        return rows.map(row => {
-                            const obj = {};
-                            headers.forEach((header, index) => {
-                                obj[header] = row[index] || '';
-                            });
-                            return obj;
-                        });
-                    }
-                }
-                
-                throw new Error('Invalid data format from products API');
-            } catch (error) {
-                console.error('Error fetching products data:', error);
-                throw error;
-            }
+// Function to fetch products data
+async function fetchProductsData() {
+    try {
+        console.log('Fetching products data from:', PRODUCT_API_URL);
+        const response = await fetch(PRODUCT_API_URL);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        console.log('Products API response:', result);
+        
+        // The proxy returns the data directly
+        if (result.success && Array.isArray(result.data)) {
+            return result.data;
+        }
+        
+        throw new Error('Invalid data format from products API');
+    } catch (error) {
+        console.error('Error fetching products data:', error);
+        throw error;
+    }
+}        
 
         // Update dashboard statistics
         function updateDashboardStats() {
@@ -2693,5 +2654,4 @@ async function confirmDeleteAgent() {
     </script>
 </body>
 </html>
-
 
