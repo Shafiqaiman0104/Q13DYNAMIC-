@@ -1513,7 +1513,7 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
         // Function to fetch orders data
         async function fetchOrdersData() {
             try {
-                console.log('Fetching orders data from:', ORDER_DATABASE_URL);
+                console.log('Fetching orders data from:', ORDER_API_URL);
                 const response = await fetch(ORDER_API_URL);
                 
                 if (!response.ok) {
@@ -1548,7 +1548,7 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
         // Function to fetch agents data - FIXED for email space issue
         async function fetchAgentsData() {
             try {
-                console.log('Fetching agents data from:', AGENT_DATABASE_URL);
+                console.log('Fetching agents data from:', AGENT_API_URL);
                 const response = await fetch(AGENT_API_URL);
                 
                 if (!response.ok) {
@@ -1585,7 +1585,7 @@ const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
         // Function to fetch products data
         async function fetchProductsData() {
             try {
-                console.log('Fetching products data from:', PRODUCT_DATABASE_URL);
+                console.log('Fetching products data from:', PRODUCT_API_URL);
                 const response = await fetch(PRODUCT_API_URL);
                 
                 if (!response.ok) {
@@ -2693,3 +2693,4 @@ async function confirmDeleteAgent() {
     </script>
 </body>
 </html>
+
