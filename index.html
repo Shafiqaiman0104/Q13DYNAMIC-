@@ -2697,40 +2697,51 @@ async function validateAgentId(agentId) {
         return new Promise((resolve) => {
             const callbackName = 'validateAgentCallback_' + Date.now();
             
-            window[callbackName] = function(response) {
-                // Clean up
-                delete window[callbackName];
-                
-                if (response && response.success && response.data) {
-                    // Check if agent ID exists in the data
-                    const agents = response.data;
-                    const agentExists = agents.some(agent => {
-                        // Adjust this based on your actual data structure
-                        // agent[0] is agentId, agent[1] is name, etc.
-                        return agent[0] && agent[0].toString().toLowerCase() === agentId.toLowerCase();
-                    });
-                    
-                    if (agentExists) {
-                        currentAgentId = agentId;
-                        agentDiscountApplied = true;
-                        showDiscountMessage('Valid agent discount applied! RM5 discount will be added to your order.', 'success');
-                        updateOrderSummary();
-                        resolve(true);
-                    } else {
-                        showDiscountMessage('Invalid discount code. Please check and try again.', 'error');
-                        agentDiscountApplied = false;
-                        currentAgentId = null;
-                        updateOrderSummary();
-                        resolve(false);
-                    }
-                } else {
-                    showDiscountMessage('Error checking discount code. Please try again.', 'error');
-                    agentDiscountApplied = false;
-                    currentAgentId = null;
-                    updateOrderSummary();
-                    resolve(false);
-                }
-            };
+           window[callbackName] = function(response) {
+    // Clean up
+    delete window[callbackName];
+    
+    // 1. Check if the API call itself was successful
+    if (response && response.success && Array.isArray(response.data)) {
+        // 2. Search through the array of agents for a matching ID
+        const agentsArray = response.data;
+        let agentFound = false;
+        
+        // agentsArray is a 2D array: each inner array is a row from Google Sheets
+        // The agentId is in the FIRST column (index 0) of each row
+        for (let i = 0; i < agentsArray.length; i++) {
+            // Skip the header row if your sheet has one (like "Agent ID", "Name", ...)
+            // Adjust the index if your agentId is in a different column
+            const storedAgentId = agentsArray[i][0]; 
+            
+            if (storedAgentId && storedAgentId.toString().toLowerCase() === agentId.toLowerCase()) {
+                agentFound = true;
+                break;
+            }
+        }
+        
+        if (agentFound) {
+            currentAgentId = agentId;
+            agentDiscountApplied = true;
+            showDiscountMessage('Valid agent discount applied! RM5 discount will be added to your order.', 'success');
+            updateOrderSummary();
+            resolve(true);
+        } else {
+            showDiscountMessage('Invalid discount code. Please check and try again.', 'error');
+            agentDiscountApplied = false;
+            currentAgentId = null;
+            updateOrderSummary();
+            resolve(false);
+        }
+    } else {
+        // API returned an error or no data
+        showDiscountMessage('Error checking discount code. Please try again.', 'error');
+        agentDiscountApplied = false;
+        currentAgentId = null;
+        updateOrderSummary();
+        resolve(false);
+    }
+};
             
             // Create script tag for JSONP
             const script = document.createElement('script');
@@ -5057,4 +5068,5 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
+
 
