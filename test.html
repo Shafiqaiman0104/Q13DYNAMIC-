@@ -1836,26 +1836,6 @@ body.splash-active {
 .stat-bar-fill.style-bar {
     background: linear-gradient(90deg, #8b5cf6, #7c3aed);
 }
-/* Discount Code Styles */
-.discount-code-group {
-    background: #f0f9ff;
-    border: 2px solid var(--primary);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-}
-
-.discount-code-group label {
-    color: var(--primary);
-    font-weight: 700;
-}
-
-.discount-code-input {
-    background-color: #f8fafc;
-    border: 2px solid var(--gray);
-    color: var(--dark-gray);
-    cursor: not-allowed;
-}
     </style>
 </head>
 <body>
@@ -2290,43 +2270,50 @@ body.splash-active {
                 <button class="close-order-modal" id="close-order-modal">&times;</button>
             </div>
             
-            <div class="order-details">
-                <h4>Order Summary</h4>
-                <div class="order-item">
-                    <span class="order-label">Product:</span>
-                    <span class="order-value" id="order-product-name">-</span>
-                </div>
-                <div class="order-item">
-                    <span class="order-label">Product Price:</span>
-                    <span class="order-value" id="order-product-price">RM 0</span>
-                </div>
-                <div class="order-item">
-                    <span class="order-label">Postage Fee:</span>
-                    <span class="order-value" id="order-postage-fee">RM 0</span>
-                </div>
-<!-- Add this after the product price section in order modal -->
-<div class="order-item">
-    <span class="order-label">Minimum Order (MOQ):</span>
-    <span class="order-value" id="order-moq">-</span>
-</div>
-<!-- Add this after the product price section -->
-<div class="order-item">
-    <span class="order-label">Quantity:</span>
-    <div class="quantity-controls" style="display: flex; align-items: center; gap: 10px;">
-        <button type="button" class="quantity-btn" id="decrease-qty" style="width: 30px; height: 30px; border-radius: 50%; background: var(--gray); border: none; cursor: pointer;">-</button>
-        <input type="number" id="product-quantity" value="1" min="1" max="10" style="width: 60px; text-align: center; padding: 5px; border: 2px solid var(--gray); border-radius: 8px;">
-        <button type="button" class="quantity-btn" id="increase-qty" style="width: 30px; height: 30px; border-radius: 50%; background: var(--gray); border: none; cursor: pointer;">+</button>
+<div class="order-details">
+    <h4>Order Summary</h4>
+    <div class="order-item">
+        <span class="order-label">Product:</span>
+        <span class="order-value" id="order-product-name">-</span>
     </div>
-</div>
-                <div class="order-item">
-                    <span class="order-label">Admin Fee:</span>
-                    <span class="order-value" id="order-payment-fee">RM 1</span>
-                </div>
-                <div class="order-item total-price">
-                    <span class="order-label">Total Price:</span>
-                    <span class="order-value" id="order-total-price">RM 0</span>
-                </div>
-            </div>
+    <div class="order-item">
+        <span class="order-label">Product Price:</span>
+        <span class="order-value" id="order-product-price">RM 0</span>
+    </div>
+    <div class="order-item">
+        <span class="order-label">Postage Fee:</span>
+        <span class="order-value" id="order-postage-fee">RM 0</span>
+    </div>
+    <div class="order-item">
+        <span class="order-label">Minimum Order (MOQ):</span>
+        <span class="order-value" id="order-moq">-</span>
+    </div>
+    <div class="order-item">
+        <span class="order-label">Quantity:</span>
+        <div class="quantity-controls" style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="quantity-btn" id="decrease-qty" style="width: 30px; height: 30px; border-radius: 50%; background: var(--gray); border: none; cursor: pointer;">-</button>
+            <input type="number" id="product-quantity" value="1" min="1" max="10" style="width: 60px; text-align: center; padding: 5px; border: 2px solid var(--gray); border-radius: 8px;">
+            <button type="button" class="quantity-btn" id="increase-qty" style="width: 30px; height: 30px; border-radius: 50%; background: var(--gray); border: none; cursor: pointer;">+</button>
+        </div>
+    </div>
+    <div class="order-item">
+        <span class="order-label">Admin Fee:</span>
+        <span class="order-value" id="order-payment-fee">RM 1</span>
+    </div>
+    <!-- Add these discount lines -->
+    <div class="order-item" id="discount-code-item" style="display: none;">
+        <span class="order-label">Discount Code:</span>
+        <span class="order-value" id="discount-code-value" style="color: var(--secondary);">-RM 5.00</span>
+    </div>
+    <div class="order-item" id="spin-discount-item" style="display: none;">
+        <span class="order-label">Spin Wheel Discount:</span>
+        <span class="order-value" id="spin-discount-value" style="color: var(--secondary);">-RM 0</span>
+    </div>
+    <div class="order-item total-price">
+        <span class="order-label">Total Price:</span>
+        <span class="order-value" id="order-total-price">RM 0</span>
+    </div>
+</div>            
             
             <div class="cod-charge-info">
                 <strong>🔔 INFORMATION :</strong><br>
@@ -2361,6 +2348,14 @@ body.splash-active {
 <div class="form-group">
     <label for="customer-note">Special Request / Note (Optional)</label>
     <textarea id="customer-note" class="form-control" rows="3" placeholder="Any special instructions, requests, or notes for your order..."></textarea>
+</div>
+
+<!-- Add this after the customer note field -->
+<div class="form-group">
+    <label for="discount-code">Discount Code (Optional)</label>
+    <input type="text" id="discount-code" class="form-control" 
+           placeholder="Enter discount code" 
+           style="background-color: #f8fafc;">
 </div>
                 
                 <div class="order-buttons">
@@ -2495,6 +2490,11 @@ const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV
         let fireworksData = [];
         let filteredData = [];
         let currentOrderProduct = null;
+
+// Global variables for discount
+let currentAgentId = null;
+let agentDiscountApplied = false;
+const AGENT_DISCOUNT_AMOUNT = 5;
 
 // Global variables to store min/max values
 let minSize = Infinity, maxSize = 0;
@@ -2661,6 +2661,152 @@ window.addEventListener('resize', () => {
     }
 });
 
+// Function to check URL parameters for discount code
+function checkUrlForDiscountCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const discountParam = urlParams.get('discount');
+    
+    if (discountParam) {
+        currentAgentId = discountParam;
+        // Auto-fill and disable discount code field
+        const discountInput = document.getElementById('discount-code');
+        if (discountInput) {
+            discountInput.value = discountParam;
+            discountInput.disabled = true;
+            discountInput.style.backgroundColor = '#e5e7eb';
+            discountInput.style.cursor = 'not-allowed';
+            
+            // Validate the agent ID immediately
+            validateAgentId(discountParam);
+        }
+    }
+}
+
+// Function to validate agent ID against database
+async function validateAgentId(agentId) {
+    try {
+        // Fetch agent data from Google Sheets
+        const response = await fetch(`${AGENT_DATABASE_URL}?format=jsonp&callback=agentCallback&t=${new Date().getTime()}`, {
+            mode: 'no-cors'
+        }).catch(async () => {
+            // If direct fetch fails, try JSONP
+            return new Promise((resolve) => {
+                const callbackName = 'agentCallback_' + new Date().getTime();
+                window[callbackName] = function(response) {
+                    resolve(response);
+                };
+                
+                const script = document.createElement('script');
+                script.src = `${AGENT_DATABASE_URL}?format=jsonp&callback=${callbackName}&t=${new Date().getTime()}`;
+                script.onerror = () => resolve({ success: false, message: 'Network error' });
+                document.head.appendChild(script);
+            });
+        });
+        
+        // Parse response (this is simplified - you'll need to adjust based on your actual API response)
+        let agents = [];
+        if (response && response.success && response.data) {
+            agents = response.data;
+        }
+        
+        // Check if agent ID exists in the data
+        // Note: Adjust this based on your actual data structure
+        const agentExists = agents.some(agent => {
+            // Assuming agent data is in format: [agentId, name, phone, email, address, timestamp]
+            return agent[0] === agentId; // agentId is in first column
+        });
+        
+        if (agentExists) {
+            agentDiscountApplied = true;
+            showDiscountMessage('Valid agent discount applied! RM5 discount will be added to your order.', 'success');
+            updateOrderSummary(); // Update total with discount
+            return true;
+        } else {
+            showDiscountMessage('Invalid discount code. Please check and try again.', 'error');
+            agentDiscountApplied = false;
+            updateOrderSummary(); // Update total without discount
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('Error validating agent ID:', error);
+        showDiscountMessage('Error checking discount code. Please try again.', 'error');
+        agentDiscountApplied = false;
+        updateOrderSummary();
+        return false;
+    }
+}
+
+// Function to show discount validation messages
+function showDiscountMessage(message, type) {
+    // Create or get message element
+    let messageDiv = document.getElementById('discount-message');
+    if (!messageDiv) {
+        messageDiv = document.createElement('div');
+        messageDiv.id = 'discount-message';
+        messageDiv.style.marginTop = '10px';
+        messageDiv.style.padding = '10px';
+        messageDiv.style.borderRadius = '8px';
+        messageDiv.style.fontSize = '0.9rem';
+        
+        const discountGroup = document.querySelector('#discount-code').parentNode;
+        discountGroup.appendChild(messageDiv);
+    }
+    
+    messageDiv.textContent = message;
+    messageDiv.style.display = 'block';
+    
+    if (type === 'success') {
+        messageDiv.style.backgroundColor = '#d1fae5';
+        messageDiv.style.border = '1px solid #10b981';
+        messageDiv.style.color = '#065f46';
+    } else {
+        messageDiv.style.backgroundColor = '#fee2e2';
+        messageDiv.style.border = '1px solid #ef4444';
+        messageDiv.style.color = '#7f1d1d';
+    }
+    
+    // Auto-hide after 5 seconds for error messages
+    if (type === 'error') {
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Function to handle manual discount code input
+function setupDiscountCodeListener() {
+    const discountInput = document.getElementById('discount-code');
+    if (discountInput) {
+        // Only add listener if field is not disabled (not from URL)
+        if (!discountInput.disabled) {
+            let validateTimeout;
+            
+            discountInput.addEventListener('input', (e) => {
+                clearTimeout(validateTimeout);
+                
+                const code = e.target.value.trim();
+                if (code.length >= 3) { // Start validating after 3 characters
+                    validateTimeout = setTimeout(() => {
+                        validateAgentId(code);
+                    }, 1000);
+                } else if (code === '') {
+                    // Clear discount if field is empty
+                    currentAgentId = null;
+                    agentDiscountApplied = false;
+                    updateOrderSummary();
+                    
+                    // Hide message
+                    const messageDiv = document.getElementById('discount-message');
+                    if (messageDiv) {
+                        messageDiv.style.display = 'none';
+                    }
+                }
+            });
+        }
+    }
+}
+
 // Add CSS for body when menu is open
 const style = document.createElement('style');
 style.textContent = `
@@ -2669,38 +2815,6 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-// Function to get URL parameters
-function getUrlParameter(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-}
-
-// Function to validate discount code against agent database
-async function validateDiscountCode(discountCode) {
-    try {
-        const response = await fetch(AGENT_DATABASE_URL);
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-            // Check if discount code exists in agent database (column 0 = agentId)
-            const agents = data.data;
-            for (let i = 1; i < agents.length; i++) { // Skip header row
-                if (agents[i][0] === discountCode) {
-                    return {
-                        valid: true,
-                        discount: 5,
-                        agentId: discountCode
-                    };
-                }
-            }
-        }
-        return { valid: false, discount: 0, agentId: null };
-    } catch (error) {
-        console.error('Error validating discount code:', error);
-        return { valid: false, discount: 0, agentId: null };
-    }
-}
 
 // Function to calculate individual category points
 function calculateCategoryPoints(product) {
@@ -3695,6 +3809,14 @@ if (durationValue !== "all") {
 // MODIFY the openOrderModal function to check for spin wheel eligibility
 function openOrderModal(product) {
     currentOrderProduct = product;
+
+    // Reset discount states
+    agentDiscountApplied = false;
+    
+    // Check URL for discount code when modal opens
+    setTimeout(() => {
+        checkUrlForDiscountCode();
+    }, 100);
     
     // Calculate MOQ based on product price
     const moq = calculateMOQ(product.price);
@@ -3706,55 +3828,6 @@ function openOrderModal(product) {
     orderForm.reset();
     document.getElementById('product-quantity').value = moq; // Set to MOQ instead of 1
     submitOrderBtn.disabled = false;
-
-    // Check for URL parameter discount code
-    const urlDiscountCode = getUrlParameter('discount') || getUrlParameter('ref');
-
-   if (urlDiscountCode) {
-        // Validate discount code
-        validateDiscountCode(urlDiscountCode).then(result => {
-            if (result.valid) {
-                // Create discount code field if it doesn't exist
-                let discountField = document.getElementById('discount-code-input');
-                if (!discountField) {
-                    discountField = document.createElement('input');
-                    discountField.type = 'text';
-                    discountField.id = 'discount-code-input';
-                    discountField.className = 'form-control discount-code-input';
-                    discountField.disabled = true;
-                    
-                    // Add before the submit button
-                    const form = document.getElementById('order-form');
-                    const submitBtn = document.getElementById('submit-order-btn');
-                    form.insertBefore(discountField, submitBtn);
-                    
-                    // Add label
-                    const label = document.createElement('label');
-                    label.textContent = 'Discount Code';
-                    label.htmlFor = 'discount-code-input';
-                    label.style.display = 'block';
-                    label.style.marginBottom = '8px';
-                    label.style.color = 'var(--primary)';
-                    label.style.fontWeight = '600';
-                    form.insertBefore(label, discountField);
-                }
-                
-                // Set and disable the discount code
-                discountField.value = urlDiscountCode;
-                discountField.disabled = true;
-                
-                // Store discount info
-                window.currentDiscount = {
-                    code: urlDiscountCode,
-                    amount: 5,
-                    valid: true
-                };
-                
-                // Update order summary with discount
-                updateOrderSummary();
-            }
-        });
-    }
     
     // Calculate total price with discount
     updateOrderSummary();
@@ -3769,6 +3842,16 @@ function openOrderModal(product) {
 }
         // Close order modal
         function closeOrderModal() {
+
+    // Clear discount states
+    currentAgentId = null;
+    agentDiscountApplied = false;
+    
+    // Clear discount message
+    const messageDiv = document.getElementById('discount-message');
+    if (messageDiv) {
+        messageDiv.style.display = 'none';
+    }
             orderModal.style.display = "none";
             currentOrderProduct = null;
         }
@@ -3817,17 +3900,17 @@ function updateOrderSummary() {
     const postagePerUnit = currentOrderProduct.postage || 0;
     const totalPostage = postagePerUnit * quantity;
     
-    // Check agent discount
-    const agentDiscount = window.currentDiscount && window.currentDiscount.valid ? window.currentDiscount.amount : 0;
+    // Check if product is eligible for spin wheel discount (≥ RM500)
+    const isEligibleForSpinDiscount = totalProductPrice >= 500;
     
-    // Check spin wheel discount
-    const isEligibleForWheelDiscount = totalProductPrice >= 500;
-    const wheelDiscount = isEligibleForWheelDiscount ? getCurrentDiscount() : 0;
+    // Calculate spin wheel discount
+    const spinDiscount = isEligibleForSpinDiscount ? getCurrentDiscount() : 0;
     
-    // Total discount (agent + wheel)
-    const totalDiscount = agentDiscount + wheelDiscount;
+    // Calculate agent discount
+    const agentDiscount = agentDiscountApplied ? AGENT_DISCOUNT_AMOUNT : 0;
     
-    const totalPrice = totalProductPrice + paymentFee + totalPostage - totalDiscount;
+    // Calculate total price
+    const totalPrice = totalProductPrice + paymentFee + totalPostage - spinDiscount - agentDiscount;
     
     // Update order summary display
     orderProductPrice.textContent = `RM ${totalProductPrice.toFixed(2)} (${quantity} × RM ${productPricePerUnit.toFixed(2)})`;
@@ -3838,53 +3921,34 @@ function updateOrderSummary() {
         postageElement.textContent = `RM ${totalPostage.toFixed(2)} (${quantity} × RM ${postagePerUnit.toFixed(2)})`;
     }
 
-    orderTotalPrice.textContent = `RM ${totalPrice.toFixed(2)}`;
+    // Update discount displays
+    const discountCodeItem = document.getElementById('discount-code-item');
+    const discountCodeValue = document.getElementById('discount-code-value');
+    const spinDiscountItem = document.getElementById('spin-discount-item');
+    const spinDiscountValue = document.getElementById('spin-discount-value');
     
-    // Add discount line to order summary
-    let discountElement = document.getElementById('order-discount');
-    
-    // Only show discount if there is any discount
-    if (totalDiscount > 0) {
-        if (!discountElement) {
-            discountElement = document.createElement('div');
-            discountElement.className = 'order-item';
-            discountElement.id = 'order-discount';
-            
-            const discountLabel = document.createElement('span');
-            discountLabel.className = 'order-label';
-            discountLabel.textContent = 'Discount:';
-            
-            const discountValue = document.createElement('span');
-            discountValue.className = 'order-value';
-            discountValue.id = 'order-discount-value';
-            
-            discountElement.appendChild(discountLabel);
-            discountElement.appendChild(discountValue);
-            
-            // Insert before total price
-            const orderDetails = document.querySelector('.order-details');
-            const totalItem = orderDetails.querySelector('.total-price');
-            orderDetails.insertBefore(discountElement, totalItem);
-        }
-        
-        const discountValueElement = document.getElementById('order-discount-value');
-        
-        // Build discount description
-        let discountDesc = [];
-        if (agentDiscount > 0) {
-            discountDesc.push(`Agent Code: RM${agentDiscount}`);
-        }
-        if (wheelDiscount > 0) {
-            discountDesc.push(`Spin Wheel: RM${wheelDiscount}`);
-        }
-        
-        discountValueElement.textContent = `-RM ${totalDiscount.toFixed(2)} (${discountDesc.join(' + ')})`;
-        discountValueElement.style.color = 'var(--secondary)';
-        discountValueElement.style.fontWeight = '700';
-    } else if (discountElement) {
-        // Remove discount element if no discount
-        discountElement.remove();
+    // Show/hide agent discount
+    if (agentDiscount > 0) {
+        discountCodeItem.style.display = 'flex';
+        discountCodeValue.textContent = `-RM ${agentDiscount.toFixed(2)}`;
+        discountCodeValue.style.color = 'var(--secondary)';
+        discountCodeValue.style.fontWeight = '700';
+    } else {
+        discountCodeItem.style.display = 'none';
     }
+    
+    // Show/hide spin wheel discount
+    if (spinDiscount > 0 && isEligibleForSpinDiscount) {
+        spinDiscountItem.style.display = 'flex';
+        spinDiscountValue.textContent = `-RM ${spinDiscount.toFixed(2)}`;
+        spinDiscountValue.style.color = 'var(--secondary)';
+        spinDiscountValue.style.fontWeight = '700';
+    } else {
+        spinDiscountItem.style.display = 'none';
+    }
+    
+    // Update total price
+    orderTotalPrice.textContent = `RM ${totalPrice.toFixed(2)}`;
 }
 
 function generateToyyibPayLink(orderData) {
@@ -3978,7 +4042,6 @@ async function handleOrderSubmit(event) {
     const deliveryAddress = document.getElementById('delivery-address').value;
     const customerNote = document.getElementById('customer-note').value;
     const productQuantity = document.getElementById('product-quantity').value;
- const discountCode = document.getElementById('discount-code-input') ? document.getElementById('discount-code-input').value : '';
     
     // Validate form data
     if (!customerName || !customerPhone || !customerEmail || !deliveryAddress) {
@@ -4043,37 +4106,34 @@ if (customerPhone.includes(' ')) {
     submitOrderBtn.disabled = true;
     submitOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     
- // Calculate discounts
+    // Check if product is eligible for discount (total price ≥ RM500)
+    const isEligibleForDiscount = totalProductPrice >= 500;
+    const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
+    // Calculate postage fee
     const postagePerUnit = currentOrderProduct.postage || 0;
     const totalPostage = postagePerUnit * quantity;
-    const agentDiscount = window.currentDiscount && window.currentDiscount.valid ? window.currentDiscount.amount : 0;
-    const isEligibleForWheelDiscount = totalProductPrice >= 500;
-    const wheelDiscount = isEligibleForWheelDiscount ? getCurrentDiscount() : 0;
-    const totalDiscount = agentDiscount + wheelDiscount;
-    const totalPrice = totalProductPrice + paymentFee + totalPostage - totalDiscount;   
-
+    const totalPrice = totalProductPrice + paymentFee + totalPostage - discount;
     
-    // Create order data object
-    const orderData = {
-        timestamp: new Date().toISOString(),
-        productCode: currentOrderProduct.code,
-        productName: currentOrderProduct.name,
-        productPrice: currentOrderProduct.price,
-        productQuantity: quantity, // ADD THIS
-        postageFee: totalPostage, // ADD THIS LINE
-        discount: totalDiscount,
-        agentDiscount: agentDiscount, // Add this
-         spinWheelDiscount: wheelDiscount, // Add this
-         discountCode: discountCode, // Add this
-        customerName: customerName,
-        customerPhone: customerPhone,
-        customerEmail: customerEmail,
-        deliveryAddress: deliveryAddress,
-        spinPrize: wheelDiscount,
-        customerNote: customerNote,
-        paymentFee: 1,
-        totalPrice: totalPrice
-    };
+    // Update the order data object
+const orderData = {
+    timestamp: new Date().toISOString(),
+    productCode: currentOrderProduct.code,
+    productName: currentOrderProduct.name,
+    productPrice: currentOrderProduct.price,
+    productQuantity: quantity,
+    postageFee: totalPostage,
+    discount: spinDiscount, // Spin wheel discount
+    customerName: customerName,
+    customerPhone: customerPhone,
+    customerEmail: customerEmail,
+    deliveryAddress: deliveryAddress,
+    spinPrize: spinDiscount,
+    discountCode: agentDiscountApplied ? "RM5" : "", // Agent discount code
+    userId: currentAgentId || "", // Agent ID from URL or input
+    customerNote: customerNote,
+    paymentFee: 1,
+    totalPrice: totalPrice
+};
     
     try {
         // Send order data to Google Sheets
@@ -4362,19 +4422,15 @@ function initializePage() {
 // Initialize sections
 initializeSections();
 
+// Initialize discount code system
+checkUrlForDiscountCode();
+setupDiscountCodeListener();
+
 // Initialize agent form
 initializeAgentForm();
 
 // Initialize stats modal
 initializeStatsModal();
-
-
-  // Check for discount parameter in URL
-    const discountCode = getUrlParameter('discount') || getUrlParameter('ref');
-    if (discountCode) {
-        console.log('Discount code detected in URL:', discountCode);
-        // You can show a notification or badge indicating discount available
-    }
 
 // Update the increase/decrease button event listeners:
 
