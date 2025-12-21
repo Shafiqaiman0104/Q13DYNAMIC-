@@ -4096,23 +4096,29 @@ if (customerPhone.includes(' ')) {
         return;
     }
 
-    // Calculate prices with quantity
-    const quantity = parseInt(productQuantity) || 1;
-    const productPricePerUnit = currentOrderProduct.price || 0;
-    const totalProductPrice = productPricePerUnit * quantity;
-    const paymentFee = 1;
-    
-    // Disable submit button while processing
-    submitOrderBtn.disabled = true;
-    submitOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    
-    // Check if product is eligible for discount (total price ≥ RM500)
-    const isEligibleForDiscount = totalProductPrice >= 500;
-    const discount = isEligibleForDiscount ? getCurrentDiscount() : 0;
-    // Calculate postage fee
-    const postagePerUnit = currentOrderProduct.postage || 0;
-    const totalPostage = postagePerUnit * quantity;
-    const totalPrice = totalProductPrice + paymentFee + totalPostage - discount;
+// Calculate prices with quantity
+const quantity = parseInt(productQuantity) || 1;
+const productPricePerUnit = currentOrderProduct.price || 0;
+const totalProductPrice = productPricePerUnit * quantity;
+const paymentFee = 1;
+
+// Calculate postage fee
+const postagePerUnit = currentOrderProduct.postage || 0;
+const totalPostage = postagePerUnit * quantity;
+
+// Check if product is eligible for spin wheel discount (≥ RM500)
+const isEligibleForSpinDiscount = totalProductPrice >= 500;
+const spinDiscount = isEligibleForSpinDiscount ? getCurrentDiscount() : 0;
+
+// Calculate agent discount
+const agentDiscount = agentDiscountApplied ? AGENT_DISCOUNT_AMOUNT : 0;
+
+// Calculate total price
+const totalPrice = totalProductPrice + paymentFee + totalPostage - spinDiscount - agentDiscount;
+
+// Disable submit button while processing
+submitOrderBtn.disabled = true;
+submitOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     
     // Update the order data object
 const orderData = {
