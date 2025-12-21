@@ -1836,6 +1836,12 @@ body.splash-active {
 .stat-bar-fill.style-bar {
     background: linear-gradient(90deg, #8b5cf6, #7c3aed);
 }
+        /* Add to your CSS */
+#discount-message.info {
+    background-color: #e0f2fe;
+    border: 1px solid #0ea5e9;
+    color: #0369a1;
+}
     </style>
 </head>
 <body>
@@ -2685,59 +2691,84 @@ function checkUrlForDiscountCode() {
 // Function to validate agent ID against database
 async function validateAgentId(agentId) {
     try {
-        // Fetch agent data from Google Sheets
-        const response = await fetch(`${AGENT_DATABASE_URL}?format=jsonp&callback=agentCallback&t=${new Date().getTime()}`, {
-            mode: 'no-cors'
-        }).catch(async () => {
-            // If direct fetch fails, try JSONP
-            return new Promise((resolve) => {
-                const callbackName = 'agentCallback_' + new Date().getTime();
-                window[callbackName] = function(response) {
-                    resolve(response);
-                };
+        showDiscountMessage('Checking discount code...', 'info');
+        
+        // Create a JSONP request for agent validation
+        return new Promise((resolve) => {
+            const callbackName = 'validateAgentCallback_' + Date.now();
+            
+            window[callbackName] = function(response) {
+                // Clean up
+                delete window[callbackName];
                 
-                const script = document.createElement('script');
-                script.src = `${AGENT_DATABASE_URL}?format=jsonp&callback=${callbackName}&t=${new Date().getTime()}`;
-                script.onerror = () => resolve({ success: false, message: 'Network error' });
-                document.head.appendChild(script);
-            });
+                if (response && response.success && response.data) {
+                    // Check if agent ID exists in the data
+                    const agents = response.data;
+                    const agentExists = agents.some(agent => {
+                        // Adjust this based on your actual data structure
+                        // agent[0] is agentId, agent[1] is name, etc.
+                        return agent[0] && agent[0].toString().toLowerCase() === agentId.toLowerCase();
+                    });
+                    
+                    if (agentExists) {
+                        currentAgentId = agentId;
+                        agentDiscountApplied = true;
+                        showDiscountMessage('Valid agent discount applied! RM5 discount will be added to your order.', 'success');
+                        updateOrderSummary();
+                        resolve(true);
+                    } else {
+                        showDiscountMessage('Invalid discount code. Please check and try again.', 'error');
+                        agentDiscountApplied = false;
+                        currentAgentId = null;
+                        updateOrderSummary();
+                        resolve(false);
+                    }
+                } else {
+                    showDiscountMessage('Error checking discount code. Please try again.', 'error');
+                    agentDiscountApplied = false;
+                    currentAgentId = null;
+                    updateOrderSummary();
+                    resolve(false);
+                }
+            };
+            
+            // Create script tag for JSONP
+            const script = document.createElement('script');
+            script.src = `${AGENT_DATABASE_URL}?format=jsonp&callback=${callbackName}&t=${Date.now()}`;
+            script.onerror = () => {
+                showDiscountMessage('Network error. Please check your connection.', 'error');
+                agentDiscountApplied = false;
+                currentAgentId = null;
+                updateOrderSummary();
+                resolve(false);
+            };
+            
+            document.head.appendChild(script);
+            
+            // Timeout after 10 seconds
+            setTimeout(() => {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    showDiscountMessage('Request timeout. Please try again.', 'error');
+                    agentDiscountApplied = false;
+                    currentAgentId = null;
+                    updateOrderSummary();
+                    resolve(false);
+                }
+            }, 10000);
         });
-        
-        // Parse response (this is simplified - you'll need to adjust based on your actual API response)
-        let agents = [];
-        if (response && response.success && response.data) {
-            agents = response.data;
-        }
-        
-        // Check if agent ID exists in the data
-        // Note: Adjust this based on your actual data structure
-        const agentExists = agents.some(agent => {
-            // Assuming agent data is in format: [agentId, name, phone, email, address, timestamp]
-            return agent[0] === agentId; // agentId is in first column
-        });
-        
-        if (agentExists) {
-            agentDiscountApplied = true;
-            showDiscountMessage('Valid agent discount applied! RM5 discount will be added to your order.', 'success');
-            updateOrderSummary(); // Update total with discount
-            return true;
-        } else {
-            showDiscountMessage('Invalid discount code. Please check and try again.', 'error');
-            agentDiscountApplied = false;
-            updateOrderSummary(); // Update total without discount
-            return false;
-        }
         
     } catch (error) {
         console.error('Error validating agent ID:', error);
         showDiscountMessage('Error checking discount code. Please try again.', 'error');
         agentDiscountApplied = false;
+        currentAgentId = null;
         updateOrderSummary();
         return false;
     }
 }
 
-// Function to show discount validation messages
+// Update the showDiscountMessage function
 function showDiscountMessage(message, type) {
     // Create or get message element
     let messageDiv = document.getElementById('discount-message');
@@ -2760,20 +2791,24 @@ function showDiscountMessage(message, type) {
         messageDiv.style.backgroundColor = '#d1fae5';
         messageDiv.style.border = '1px solid #10b981';
         messageDiv.style.color = '#065f46';
-    } else {
+    } else if (type === 'error') {
         messageDiv.style.backgroundColor = '#fee2e2';
         messageDiv.style.border = '1px solid #ef4444';
         messageDiv.style.color = '#7f1d1d';
+    } else if (type === 'info') {
+        messageDiv.style.backgroundColor = '#e0f2fe';
+        messageDiv.style.border = '1px solid #0ea5e9';
+        messageDiv.style.color = '#0369a1';
     }
     
     // Auto-hide after 5 seconds for error messages
-    if (type === 'error') {
+    if (type === 'error' || type === 'info') {
         setTimeout(() => {
             messageDiv.style.display = 'none';
         }, 5000);
     }
 }
-
+        
 // Function to handle manual discount code input
 function setupDiscountCodeListener() {
     const discountInput = document.getElementById('discount-code');
@@ -4152,20 +4187,29 @@ const orderData = {
             
             // Generate REAL ToyyibPay payment link
             const paymentLink = await generateToyyibPayLink(orderData);
-            
+        
             // Show confirmation message with discount info
-            let message = `Order submitted successfully!\n\n`;
-            message += `Product Price: RM ${currentOrderProduct.price.toFixed(2)}\n`;
-            message += `Product Quantity: ${quantity}\n`;
-            message += `Postage Fee: RM ${totalPostage.toFixed(2)} (${quantity} × RM ${postagePerUnit.toFixed(2)})\n`; // ADD THIS LINE
-            message += `Admin Fee: RM 1\n`;
-            if (discount > 0) {
-                message += `Discount: -RM ${discount.toFixed(2)}\n`;
-            }
-            message += `Total Amount: RM ${totalPrice.toFixed(2)}\n\n`;
-            message += `⚠️ IMPORTANT: Payment link expires in 5 minutes!\n\n`;
-            message += `You will now be redirected to ToyyibPay secure payment page.\n\n`;
-            message += `Note: C.O.D charges apply upon delivery based on distance.\n\n`;
+let message = `Order submitted successfully!\n\n`;
+message += `Product: ${currentOrderProduct.code} - ${currentOrderProduct.name}\n`;
+message += `Product Price: RM ${currentOrderProduct.price.toFixed(2)}\n`;
+message += `Product Quantity: ${quantity}\n`;
+message += `Postage Fee: RM ${totalPostage.toFixed(2)} (${quantity} × RM ${postagePerUnit.toFixed(2)})\n`;
+message += `Admin Fee: RM 1\n`;
+
+// Show agent discount if applied
+if (agentDiscount > 0) {
+    message += `Agent Discount Code: -RM ${agentDiscount.toFixed(2)}\n`;
+}
+
+// Show spin wheel discount if applied and eligible
+if (spinDiscount > 0 && isEligibleForSpinDiscount) {
+    message += `Spin Wheel Discount: -RM ${spinDiscount.toFixed(2)}\n`;
+}
+
+message += `Total Amount: RM ${totalPrice.toFixed(2)}\n\n`;
+message += `⚠️ IMPORTANT: Payment link expires in 5 minutes!\n\n`;
+message += `You will now be redirected to ToyyibPay secure payment page.\n\n`;
+message += `Note: C.O.D charges apply upon delivery based on distance.\n\n`;
             
             alert(message);
             
@@ -5013,3 +5057,4 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
+
