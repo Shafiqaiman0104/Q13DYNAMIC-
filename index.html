@@ -4134,7 +4134,7 @@ if (customerPhone.includes(' ')) {
         productQuantity: quantity,
         postageFee: totalPostage,
         discount: spinDiscount, // Spin wheel discount
-        discountCode: discountCodeApplied ? `RM${DISCOUNT_AMOUNT}` : "", // Agent discount code
+        discountCode: discountCodeApplied ? DISCOUNT_AMOUNT : 0, // Agent discount code (5 or 0)
         userId: currentAgentId || "", // Agent ID from discount code
         customerName: customerName,
         customerPhone: customerPhone,
