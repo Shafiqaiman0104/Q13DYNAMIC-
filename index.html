@@ -1891,6 +1891,47 @@ body.splash-active {
     cursor: not-allowed;
     opacity: 0.7;
 }
+/* Loading Popup Styles */
+.loading-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 41, 59, 0.95);
+    z-index: 1004;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.loading-popup-content {
+    background: var(--light);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.loading-popup-content i {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.loading-popup-content h4 {
+    font-size: 1.3rem;
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+
+.loading-popup-content p {
+    color: var(--dark-gray);
+    font-size: 0.95rem;
+}
     </style>
 </head>
 <body>
@@ -2506,6 +2547,15 @@ body.splash-active {
     </div>
 </div>
 
+<!-- Loading Popup -->
+<div class="loading-popup" id="loading-popup">
+    <div class="loading-popup-content">
+        <i class="fas fa-spinner fa-spin"></i>
+        <h4>Validating Discount Code</h4>
+        <p>Please wait while we verify your agent discount...</p>
+    </div>
+</div>
+
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -2751,11 +2801,18 @@ async function validateAgentId(agentId) {
     }
 }
 
-// Function to apply discount code
+// MODIFIED: Function to apply discount code with loading popup
 async function applyDiscountCode(agentId) {
     if (!agentId || discountCodeApplied) return false;
     
+    showLoading('Validating Discount Code');
+    
+    // Small delay to ensure popup shows
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const isValid = await validateAgentId(agentId);
+    
+    hideLoading();
     
     if (isValid) {
         currentDiscountCode = agentId;
@@ -2768,12 +2825,32 @@ async function applyDiscountCode(agentId) {
     }
 }
 
-// Function to auto-fill discount code from URL
+// Loading popup functions
+function showLoading(message = 'Validating Discount Code') {
+    const popup = document.getElementById('loading-popup');
+    const title = popup.querySelector('h4');
+    title.textContent = message;
+    popup.style.display = 'flex';
+}
+
+function hideLoading() {
+    const popup = document.getElementById('loading-popup');
+    popup.style.display = 'none';
+}
+
+// MODIFIED: Function to auto-fill discount code from URL with loading popup
 async function checkUrlForDiscountCode() {
     const agentIdFromUrl = getUrlParams();
     
     if (agentIdFromUrl) {
+        showLoading('Checking Agent Code from URL');
+        
+        // Small delay to ensure popup shows
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const isValid = await validateAgentId(agentIdFromUrl);
+        
+        hideLoading();
         
         if (isValid) {
             // Auto-fill and disable the discount code field
@@ -2799,7 +2876,15 @@ async function checkUrlForDiscountCode() {
                 if (currentOrderProduct) {
                     updateOrderSummary();
                 }
+                
+                // Show success message
+                alert('Agent discount code applied successfully! RM5 discount added.');
             }
+        } else {
+            // Invalid discount code from URL - show warning but don't prevent user
+            console.warn('Invalid discount code in URL:', agentIdFromUrl);
+            // Optionally show a less intrusive notification
+            // You could add a small notification here if desired
         }
     }
 }
@@ -4506,7 +4591,35 @@ initializeStatsModal();
     const discountInput = document.getElementById('discount-code');
     
     if (applyDiscountBtn) {
-        applyDiscountBtn.addEventListener('click', async () => {
+    applyDiscountBtn.addEventListener('click', async () => {
+        const agentId = discountInput.value.trim();
+        if (!agentId) {
+            alert('Please enter a discount code');
+            return;
+        }
+        
+        const isValid = await applyDiscountCode(agentId);
+        if (isValid) {
+            // Disable the field after successful application
+            discountInput.disabled = true;
+            discountInput.style.backgroundColor = '#f0f0f0';
+            discountInput.style.cursor = 'not-allowed';
+            applyDiscountBtn.style.display = 'none';
+            
+            // Update order summary
+            updateOrderSummary();
+            
+            // Show success message
+            alert('Discount code applied successfully! RM5 discount added.');
+        }
+    });
+}
+    
+    // Allow pressing Enter in discount code field
+  if (discountInput) {
+    discountInput.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
             const agentId = discountInput.value.trim();
             if (!agentId) {
                 alert('Please enter a discount code');
@@ -4519,7 +4632,11 @@ initializeStatsModal();
                 discountInput.disabled = true;
                 discountInput.style.backgroundColor = '#f0f0f0';
                 discountInput.style.cursor = 'not-allowed';
-                applyDiscountBtn.style.display = 'none';
+                
+                const applyBtn = document.getElementById('apply-discount-btn');
+                if (applyBtn) {
+                    applyBtn.style.display = 'none';
+                }
                 
                 // Update order summary
                 updateOrderSummary();
@@ -4527,41 +4644,9 @@ initializeStatsModal();
                 // Show success message
                 alert('Discount code applied successfully! RM5 discount added.');
             }
-        });
-    }
-    
-    // Allow pressing Enter in discount code field
-    if (discountInput) {
-        discountInput.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const agentId = discountInput.value.trim();
-                if (!agentId) {
-                    alert('Please enter a discount code');
-                    return;
-                }
-                
-                const isValid = await applyDiscountCode(agentId);
-                if (isValid) {
-                    // Disable the field after successful application
-                    discountInput.disabled = true;
-                    discountInput.style.backgroundColor = '#f0f0f0';
-                    discountInput.style.cursor = 'not-allowed';
-                    
-                    const applyBtn = document.getElementById('apply-discount-btn');
-                    if (applyBtn) {
-                        applyBtn.style.display = 'none';
-                    }
-                    
-                    // Update order summary
-                    updateOrderSummary();
-                    
-                    // Show success message
-                    alert('Discount code applied successfully! RM5 discount added.');
-                }
-            }
-        });
-    }
+        }
+    });
+}
 
 // Add this with other modal event listeners
 document.addEventListener('keydown', (e) => {
