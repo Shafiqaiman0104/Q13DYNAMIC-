@@ -2289,8 +2289,8 @@
                 <div class="terms-checkbox" id="agent-terms-checkbox">
                     <input type="checkbox" id="agent-agree-terms" name="agent-agree-terms" required>
                     <label for="agent-agree-terms">
-                        I have read and agree to the <a href="#terms" onclick="openTermsSection()">Terms & Conditions</a> of Q13 DYNAMIC.
-                    </label>
+        I have read and agree to the <a href="#terms" onclick="openTermsSection('agent')">Terms & Conditions</a> of Q13 DYNAMIC.
+    </label>
                 </div>
                 
                 <div class="order-buttons" style="margin-top: 25px;">
@@ -2562,7 +2562,7 @@
 <div class="terms-checkbox" id="order-terms-checkbox">
     <input type="checkbox" id="agree-terms" name="agree-terms" required>
     <label for="agree-terms">
-        I have read and agree to the <a href="#terms" onclick="openTermsSection()">Terms & Conditions</a> of Q13 DYNAMIC.
+        I have read and agree to the <a href="#terms" onclick="openTermsSection('order')">Terms & Conditions</a> of Q13 DYNAMIC.
     </label>
 </div>
                 
@@ -2885,8 +2885,8 @@
                     <p><i class="fas fa-exclamation-triangle"></i> Always follow safety guidelines when handling fireworks. Keep a safe distance and have water nearby.</p>
                 </div>
                 <div class="copyright">
-                    <p>&copy; 2023 Q13 DYNAMIC. All rights reserved. | <a href="#terms" onclick="openTermsSection()" style="color: var(--primary); text-decoration: underline;">Terms & Conditions</a></p>
-                </div>
+    <p>&copy; 2023 Q13 DYNAMIC. All rights reserved. | <a href="#terms" onclick="openTermsSection()" style="color: var(--primary); text-decoration: underline;">Terms & Conditions</a></p>
+</div>
             </div>
         </div>
     </footer>
@@ -3079,27 +3079,36 @@ function closeMobileMenu() {
 }
 
 // Function to open Terms section (used by checkbox links)
-function openTermsSection() {
-    // Update active state
-    navLinks.forEach(navLink => navLink.classList.remove('active'));
-    document.querySelector('a[href="#terms"]').classList.add('active');
+function openTermsSection(fromModal = null) {
+    // If opening from a modal, close that modal first
+    if (fromModal === 'order') {
+        closeOrderModal();
+    } else if (fromModal === 'agent') {
+        // Close agent form if needed (you might need to add a closeAgentForm function)
+        hideMainContent();
+    }
     
-    // Close mobile menu
-    closeMobileMenu();
-    
-    // Hide main content, show terms
-    hideMainContent();
-    sections.trackOrder.style.display = 'none';
-    sections.agent.style.display = 'none';
-    sections.terms.style.display = 'block';
-    
-    // Smooth scroll to top
+    // Small delay to ensure modal closes first
     setTimeout(() => {
+        // Update active state
+        navLinks.forEach(navLink => navLink.classList.remove('active'));
+        document.querySelector('a[href="#terms"]').classList.add('active');
+        
+        // Close mobile menu
+        closeMobileMenu();
+        
+        // Hide main content, show terms
+        hideMainContent();
+        sections.trackOrder.style.display = 'none';
+        sections.agent.style.display = 'none';
+        sections.terms.style.display = 'block';
+        
+        // Smooth scroll to top
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
         });
-    }, 10);
+    }, 300); // Wait for modal closing animation
 }
 
 // Function to close Terms section
