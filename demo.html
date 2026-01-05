@@ -2568,7 +2568,7 @@
                 
                 <div class="order-buttons">
                     <button type="submit" class="submit-order-btn" id="submit-order-btn">
-                        <i class="fas fa-shopping-cart"></i> Submit Booking
+                        <i class="fas fa-shopping-cart"></i> Submit Order to WhatsApp
                     </button>
                     <button type="button" class="cancel-order-btn" id="cancel-order-btn">Cancel Order</button>
                 </div>
@@ -2706,8 +2706,8 @@
             <h2>4. ORDERS & PAYMENTS</h2>
             <ul>
                 <li>Orders can be placed online through our website.</li>
-                <li><strong>Payment Method:</strong> FPX Online Banking (Malaysia only)</li>
-                <li><strong>Payment Gateway:</strong> toyyibPay</li>
+                <li><strong>Payment Method:</strong> Bank Transfer (Maybank)</li>
+                <li><strong>Bank Account:</strong> 551032011111</li>
                 <li>Orders will only be processed after successful payment confirmation.</li>
                 <li>We reserve the right to cancel any order due to stock unavailability, pricing errors, or suspected fraud.</li>
             </ul>
@@ -2900,6 +2900,9 @@
 // AGENT FORM FUNCTIONS
 const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV7FBIQMcXCTt9qlCHDvi2Ftqzr-u5ePJGdgzMqqVWFQwdbXMRET8cldY/exec';
        
+        // WhatsApp number to send orders to
+        const WHATSAPP_NUMBER = '601160801477';
+
         // Global variables
         let fireworksData = [];
         let filteredData = [];
@@ -3970,7 +3973,7 @@ function checkNetworkStatus() {
             const avgShots = Math.round(totalShots / total);
             
             // Calculate average duration in seconds
-            const totalSeconds = fireworksData.reduce((sum, item) => {
+            const totalSeconds = fireworksData.reduce((sum, item) {
                 return sum + convertDurationToSeconds(item.duration || '0');
             }, 0);
             
@@ -4478,49 +4481,9 @@ function updateOrderSummary() {
     addDiscountCodeToSummary();
 }
 
-// Function to generate WhatsApp message
-function generateWhatsAppMessage(orderData) {
-    let message = `*DETAIL :*\n`;
-    message += `${orderData.customerName}\n`;
-    message += `${orderData.customerPhone}\n`;
-    message += `${orderData.customerEmail}\n`;
-    message += `${orderData.deliveryAddress}\n\n`;
-    
-    message += `*PRODUCT :*\n`;
-    message += `${orderData.productCode} - ${orderData.productName} x ${orderData.productQuantity}\n\n`;
-    
-    message += `*PRICE :*\n`;
-    message += `Product price RM${orderData.productPrice.toFixed(2)} (${orderData.productQuantity} x RM${(orderData.productPrice / orderData.productQuantity).toFixed(2)})\n`;
-    message += `Postage fee RM${orderData.postageFee.toFixed(2)} (${orderData.productQuantity} x RM${(orderData.postageFee / orderData.productQuantity).toFixed(2)})\n`;
-    
-    if (orderData.discountCode > 0) {
-        message += `Discount code -RM${orderData.discountCode.toFixed(2)} (code = ${currentDiscountCode})\n`;
-    }
-    
-    if (orderData.spinPrize > 0) {
-        message += `Spin the wheel -RM${orderData.spinPrize.toFixed(2)}\n`;
-    }
-    
-    message += `\n*TOTAL PRICE :*\n`;
-    message += `RM${orderData.totalPrice.toFixed(2)}`;
-    
-    // Add customer note if exists
-    if (orderData.customerNote && orderData.customerNote.trim() !== '') {
-        message += `\n\n*SPECIAL REQUEST/NOTE :*\n`;
-        message += `${orderData.customerNote}`;
-    }
-    
-    return encodeURIComponent(message);
-}
+// REMOVED: generateToyyibPayLink function - no longer needed
 
-// Function to generate order ID
-function generateOrderId() {
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substring(2, 5);
-    return `q13${timestamp}${random}`.toLowerCase();
-}
-
-// MODIFIED: Update the handleOrderSubmit function to send to database and open WhatsApp
+// MODIFIED: Update the orderData object in handleOrderSubmit function
 async function handleOrderSubmit(event) {
     event.preventDefault();
     
@@ -4551,21 +4514,21 @@ async function handleOrderSubmit(event) {
         return;
     }
     
-    // Validate phone number - must start with 6 (no starting with 0)
+        // Validate phone number - must start with 6 (no starting with 0)
     // Remove all spaces, dashes, and plus signs
     const cleanedPhone = customerPhone.replace(/\s+|-|\+/g, '');
 
-    // Check if phone has symbol
-    if (/[+\-()]/.test(customerPhone)) {
-        alert('Phone number cannot contain symbols like +, -, (, ).\n\nPlease use only numbers (e.g., 601160801477).');
-        return;
-    }
+// Check if phone has symbol
+if (/[+\-()]/.test(customerPhone)) {
+    alert('Phone number cannot contain symbols like +, -, (, ).\n\nPlease use only numbers (e.g., 601160801477).');
+    return;
+}
 
-    // Check if phone has spaces
-    if (customerPhone.includes(' ')) {
-        alert('Phone number cannot contain spaces.\n\nPlease remove spaces (e.g., 601160801477 instead of 6011 6080 1477).');
-        return;
-    }
+// Check if phone has spaces
+if (customerPhone.includes(' ')) {
+    alert('Phone number cannot contain spaces.\n\nPlease remove spaces (e.g., 601160801477 instead of 6011 6080 1477).');
+    return;
+}
     
     // Check if phone starts with 0
     if (cleanedPhone.startsWith('0')) {
@@ -4598,7 +4561,7 @@ async function handleOrderSubmit(event) {
         return;
     }
 
-    // Calculate prices with quantity
+       // Calculate prices with quantity
     const quantity = parseInt(productQuantity) || 1;
     const productPricePerUnit = currentOrderProduct.price || 0;
     const totalProductPrice = productPricePerUnit * quantity;
@@ -4620,13 +4583,9 @@ async function handleOrderSubmit(event) {
     const totalPostage = postagePerUnit * quantity;
     const totalPrice = totalProductPrice + paymentFee + totalPostage - spinDiscount - discountCodeDiscount;
     
-    // Generate order ID
-    const orderId = generateOrderId();
-    
     // Create order data object WITH DISCOUNT CODE AND USER ID
     const orderData = {
         timestamp: new Date().toISOString(),
-        orderId: orderId,
         productCode: currentOrderProduct.code,
         productName: currentOrderProduct.name,
         productPrice: currentOrderProduct.price,
@@ -4636,15 +4595,13 @@ async function handleOrderSubmit(event) {
         discountCode: discountCodeApplied ? DISCOUNT_AMOUNT : 0, // Agent discount code (5 or 0)
         userId: currentAgentId || "", // Agent ID from discount code
         customerName: customerName,
-        customerPhone: cleanedPhone,
+        customerPhone: customerPhone,
         customerEmail: customerEmail,
         deliveryAddress: deliveryAddress,
         spinPrize: spinDiscount,
         customerNote: customerNote,
         paymentFee: 1,
-        totalPrice: totalPrice,
-        status: 'Pending', // Initial status
-        paymentStatus: 'Pending'
+        totalPrice: totalPrice
     };
     
     try {
@@ -4655,42 +4612,31 @@ async function handleOrderSubmit(event) {
             // Clear spin wheel prize after successful order
             clearSpinWheelPrize();
             
-            // Generate WhatsApp message
-            const whatsappMessage = generateWhatsAppMessage(orderData);
+            // Format WhatsApp message
+            const whatsappMessage = formatWhatsAppMessage(orderData);
             
-            // Your WhatsApp number (change this to your number)
-            const whatsappNumber = '601160801477'; // Your WhatsApp number
+            // Encode the message for URL
+            const encodedMessage = encodeURIComponent(whatsappMessage);
             
             // Create WhatsApp URL
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
             
             // Show confirmation message
-            let message = `✅ *Order Submitted Successfully!*\n\n`;
-            message += `Order ID: ${orderId}\n\n`;
-            message += `📋 *Order Summary:*\n`;
-            message += `Product: ${orderData.productCode} - ${orderData.productName}\n`;
-            message += `Quantity: ${quantity}\n`;
-            message += `Product Price: RM ${currentOrderProduct.price.toFixed(2)}\n`;
-            message += `Postage Fee: RM ${totalPostage.toFixed(2)}\n`;
-            if (spinDiscount > 0) {
-                message += `Spin Wheel Discount: -RM ${spinDiscount.toFixed(2)}\n`;
-            }
-            if (discountCodeDiscount > 0) {
-                message += `Agent Discount Code: -RM ${discountCodeDiscount.toFixed(2)}\n`;
-            }
-            message += `Total Amount: RM ${totalPrice.toFixed(2)}\n\n`;
-            message += `📱 *WhatsApp Confirmation:*\n`;
-            message += `You will now be redirected to WhatsApp to send order confirmation.\n`;
-            message += `Please send the message to complete your booking.`;
+            let message = `Order submitted successfully!\n\n`;
+            message += `You will now be redirected to WhatsApp to send your order.\n\n`;
+            message += `Please make payment to:\n`;
+            message += `Bank: Maybank\n`;
+            message += `Account: 551032011111\n`;
+            message += `Amount: RM ${totalPrice.toFixed(2)}\n\n`;
+            message += `After payment, send proof to the same WhatsApp number.`;
             
             alert(message);
             
-            // Close order modal
-            closeOrderModal();
-            
-            // Open WhatsApp in new tab
+            // Redirect to WhatsApp
             window.open(whatsappUrl, '_blank');
             
+            // Close order modal
+            closeOrderModal();
         } else {
             throw new Error('Failed to save order data. Please try again.');
         }
@@ -4698,7 +4644,7 @@ async function handleOrderSubmit(event) {
     } catch (error) {
         // Re-enable submit button
         submitOrderBtn.disabled = false;
-        submitOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Submit Booking';
+        submitOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Submit Order to WhatsApp';
         
         // Show error message
         alert(`Error: ${error.message}\n\nPlease try again or contact support.`);
@@ -4707,35 +4653,50 @@ async function handleOrderSubmit(event) {
     }
 }     
 
+// NEW FUNCTION: Format WhatsApp message according to requested format
+function formatWhatsAppMessage(orderData) {
+    let message = `HI Q13 DYNAMIC!\n`;
+    message += `I would like to order this product..\n\n`;
+    
+    message += `Details :\n`;
+    message += `${orderData.customerName}\n`;
+    message += `${orderData.customerPhone}\n`;
+    message += `${orderData.customerEmail}\n`;
+    message += `${orderData.deliveryAddress}\n\n`;
+    
+    message += `Product :\n`;
+    message += `${orderData.productCode} - ${orderData.productName} x ${orderData.productQuantity}\n\n`;
+    
+    message += `Special Request / Notes : (if have)\n`;
+    message += `${orderData.customerNote || 'None'}\n\n`;
+    
+    message += `Price :\n`;
+    message += `Product price RM${(orderData.productPrice * orderData.productQuantity).toFixed(0)} (${orderData.productQuantity} x RM${orderData.productPrice.toFixed(0)})\n`;
+    message += `Postage fee  RM${orderData.postageFee.toFixed(0)} (${orderData.productQuantity} x RM${(orderData.postageFee / orderData.productQuantity).toFixed(0)})\n`;
+    
+    if (orderData.discountCode > 0) {
+        message += `Discount code -RM${orderData.discountCode.toFixed(0)} (CODE = ${currentDiscountCode})\n`;
+    }
+    
+    if (orderData.spinPrize > 0) {
+        message += `Spin the wheel -RM${orderData.spinPrize.toFixed(0)}\n`;
+    }
+    
+    message += `\nTOTAL : RM${orderData.totalPrice.toFixed(0)}\n`;
+    
+    return message;
+}
+
 // NEW FUNCTION: Send order data to Google Sheets
 async function sendOrderToGoogleSheets(orderData) {
     try {
-        // Create URL with query parameters for GET request
-        const url = new URL(ORDER_DATABASE_URL);
-        url.searchParams.append('timestamp', orderData.timestamp);
-        url.searchParams.append('orderId', orderData.orderId);
-        url.searchParams.append('productCode', orderData.productCode);
-        url.searchParams.append('productName', orderData.productName);
-        url.searchParams.append('productPrice', orderData.productPrice);
-        url.searchParams.append('productQuantity', orderData.productQuantity);
-        url.searchParams.append('postageFee', orderData.postageFee);
-        url.searchParams.append('discount', orderData.discount);
-        url.searchParams.append('discountCode', orderData.discountCode);
-        url.searchParams.append('userId', orderData.userId);
-        url.searchParams.append('customerName', orderData.customerName);
-        url.searchParams.append('customerPhone', orderData.customerPhone);
-        url.searchParams.append('customerEmail', orderData.customerEmail);
-        url.searchParams.append('deliveryAddress', orderData.deliveryAddress);
-        url.searchParams.append('spinPrize', orderData.spinPrize);
-        url.searchParams.append('customerNote', orderData.customerNote);
-        url.searchParams.append('paymentFee', orderData.paymentFee);
-        url.searchParams.append('totalPrice', orderData.totalPrice);
-        url.searchParams.append('status', orderData.status);
-        url.searchParams.append('paymentStatus', orderData.paymentStatus);
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors'
+        const response = await fetch(ORDER_DATABASE_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Important for Google Apps Script
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
         });
         
         // Note: With no-cors mode, we can't read the response
