@@ -4694,7 +4694,7 @@ async function handleOrderSubmit(event) {
     } catch (error) {
         // Re-enable submit button
         submitOrderBtn.disabled = false;
-        submitOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Proceed to Payment';
+        submitOrderBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Send to WhatsApp';
         
         // Show error message
         alert(`Error: ${error.message}\n\nPlease try again or contact support.`);
