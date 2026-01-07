@@ -2929,7 +2929,6 @@ const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV
         let fireworksData = [];
         let filteredData = [];
         let currentOrderProduct = null;
-        let hasRefreshedForOrder = false;
 
 // Add these global variables at the top with other global variables
 let currentDiscountCode = '';
@@ -4536,7 +4535,7 @@ ${orderData.customerNote || 'None'}
 }
 
 // MODIFIED: Update the orderData object in handleOrderSubmit function
-// MODIFIED: Update the handleOrderSubmit function to refresh before redirect
+// MODIFIED: Update the handleOrderSubmit function to open WhatsApp immediately
 async function handleOrderSubmit(event) {
     event.preventDefault();
     
@@ -4568,33 +4567,40 @@ async function handleOrderSubmit(event) {
     }
     
     // Validate phone number - must start with 6 (no starting with 0)
+    // Remove all spaces, dashes, and plus signs
     const cleanedPhone = customerPhone.replace(/\s+|-|\+/g, '');
 
+    // Check if phone has symbol
     if (/[+\-()]/.test(customerPhone)) {
         alert('Phone number cannot contain symbols like +, -, (, ).\n\nPlease use only numbers (e.g., 601160801477).');
         return;
     }
 
+    // Check if phone has spaces
     if (customerPhone.includes(' ')) {
         alert('Phone number cannot contain spaces.\n\nPlease remove spaces (e.g., 601160801477 instead of 6011 6080 1477).');
         return;
     }
     
+    // Check if phone starts with 0
     if (cleanedPhone.startsWith('0')) {
         alert('Phone number should start with "6" (e.g., 60123456789), not with "0".\n\nPlease remove the leading 0 and start with 6.');
         return;
     }
     
+    // Check if phone starts with 6 and has valid length (10-11 digits for Malaysian numbers)
     if (!cleanedPhone.startsWith('6')) {
         alert('Phone number should start with "6" (e.g., 60123456789).\n\nPlease enter a valid Malaysian phone number starting with 6.');
         return;
     }
     
+    // Check total length (should be 10-11 digits for Malaysian numbers: 601X-XXX-XXXX or 601XX-XXX-XXXX)
     if (cleanedPhone.length < 10 || cleanedPhone.length > 15) {
         alert('Phone number should be 10-11 digits starting with "6" (e.g., 60123456789).\n\nPlease enter a valid Malaysian phone number.');
         return;
     }
     
+    // Check if all characters are numbers
     if (!/^\d+$/.test(cleanedPhone)) {
         alert('Phone number should contain only numbers.\n\nPlease enter a valid Malaysian phone number (e.g., 60123456789).');
         return;
@@ -4629,7 +4635,7 @@ async function handleOrderSubmit(event) {
     const totalPostage = postagePerUnit * quantity;
     const totalPrice = totalProductPrice + paymentFee + totalPostage - spinDiscount - discountCodeDiscount;
     
-    // Create order data object
+    // Create order data object WITH DISCOUNT CODE AND USER ID
     const orderData = {
         timestamp: new Date().toISOString(),
         productCode: currentOrderProduct.code,
@@ -4637,9 +4643,9 @@ async function handleOrderSubmit(event) {
         productPrice: currentOrderProduct.price,
         productQuantity: quantity,
         postageFee: totalPostage,
-        discount: spinDiscount,
-        discountCode: discountCodeApplied ? DISCOUNT_AMOUNT : 0,
-        userId: currentAgentId || "",
+        discount: spinDiscount, // Spin wheel discount
+        discountCode: discountCodeApplied ? DISCOUNT_AMOUNT : 0, // Agent discount code (5 or 0)
+        userId: currentAgentId || "", // Agent ID from discount code
         customerName: customerName,
         customerPhone: cleanedPhone,
         customerEmail: customerEmail,
@@ -4658,6 +4664,9 @@ async function handleOrderSubmit(event) {
             // Clear spin wheel prize after successful order
             clearSpinWheelPrize();
             
+            // Generate WhatsApp message
+            const whatsappUrl = generateWhatsAppMessage(orderData);
+            
             // Prepare data for thank you page
             const thankYouData = new URLSearchParams({
                 name: encodeURIComponent(customerName),
@@ -4670,14 +4679,13 @@ async function handleOrderSubmit(event) {
                 notes: encodeURIComponent(customerNote || 'None')
             });
             
-            // NEW: Store order data in localStorage for after refresh
-            localStorage.setItem('pendingThankYouRedirect', thankYouData.toString());
+            // FIRST: Try to open WhatsApp immediately (this works like the resend button)
+            const whatsappWindow = window.open(whatsappUrl, '_blank');
             
-            // Set flag to prevent infinite loop
-            hasRefreshedForOrder = true;
-            
-            // Refresh the page first
-            window.location.reload();
+            // THEN: Redirect to thank you page after a short delay
+            setTimeout(() => {
+                window.location.href = `thankYouPage.html?${thankYouData.toString()}`;
+            }, 500); // 0.5 second delay
             
         } else {
             throw new Error('Failed to save order data. Please try again.');
@@ -4686,28 +4694,12 @@ async function handleOrderSubmit(event) {
     } catch (error) {
         // Re-enable submit button
         submitOrderBtn.disabled = false;
-        submitOrderBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Send to WhatsApp';
+        submitOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Proceed to Payment';
         
         // Show error message
         alert(`Error: ${error.message}\n\nPlease try again or contact support.`);
         
         console.error('Order Submission Error:', error);
-    }
-}
-
-// NEW: Function to check if we need to redirect to thank you page after refresh
-function checkForRedirectAfterRefresh() {
-    // Check if we have pending redirect data in localStorage
-    const redirectData = localStorage.getItem('pendingThankYouRedirect');
-    
-    if (redirectData && hasRefreshedForOrder) {
-        // Clear the data from localStorage
-        localStorage.removeItem('pendingThankYouRedirect');
-        
-        // Redirect to thank you page
-        setTimeout(() => {
-            window.location.href = `thankYouPage.html?${redirectData}`;
-        }, 100); // Small delay to ensure page is fully loaded
     }
 }
 
@@ -4956,14 +4948,6 @@ initializeSections();
 setTimeout(() => {
     checkUrlForDiscountCode();
 }, 1000);
-
-// NEW: Check for redirect after page refresh
-setTimeout(checkForRedirectAfterRefresh, 500);
-
-// Also check when window is fully loaded
-window.addEventListener('load', () => {
-    checkForRedirectAfterRefresh();
-});
 
 // Initialize agent form
 initializeAgentForm();
