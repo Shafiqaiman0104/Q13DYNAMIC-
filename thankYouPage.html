@@ -260,55 +260,56 @@
     </div>
 
     <script>
-        // Get order data from URL parameters
-        function getOrderDataFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-            
-            return {
-                name: decodeURIComponent(params.get('name') || ''),
-                phone: decodeURIComponent(params.get('phone') || ''),
-                email: decodeURIComponent(params.get('email') || ''),
-                address: decodeURIComponent(params.get('address') || ''),
-                productCode: decodeURIComponent(params.get('productCode') || ''),
-                productName: decodeURIComponent(params.get('productName') || ''),
-                productQuantity: decodeURIComponent(params.get('productQuantity') || '1'),
-                notes: decodeURIComponent(params.get('notes') || 'None')
-            };
+    // Get order data from URL parameters
+    function getOrderDataFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        
+        return {
+            name: decodeURIComponent(params.get('name') || ''),
+            phone: decodeURIComponent(params.get('phone') || ''),
+            email: decodeURIComponent(params.get('email') || ''),
+            address: decodeURIComponent(params.get('address') || ''),
+            productCode: decodeURIComponent(params.get('productCode') || ''),
+            productName: decodeURIComponent(params.get('productName') || ''),
+            productQuantity: decodeURIComponent(params.get('productQuantity') || '1'),
+            notes: decodeURIComponent(params.get('notes') || 'None'),
+            url: decodeURIComponent(params.get('url') || 'https://q13dynamic-vr.com/')  // ADD THIS LINE
+        };
+    }
+    
+    // Display order data on page
+    function displayOrderData() {
+        const orderData = getOrderDataFromUrl();
+        
+        // Fill in customer details
+        document.getElementById('customer-name').textContent = orderData.name || '-';
+        document.getElementById('customer-phone').textContent = orderData.phone || '-';
+        document.getElementById('customer-email').textContent = orderData.email || '-';
+        document.getElementById('customer-address').textContent = orderData.address || '-';
+        
+        // Fill in product details
+        const productList = document.getElementById('product-list');
+        if (orderData.productCode) {
+            productList.innerHTML = `${orderData.productCode} - ${orderData.productName} x ${orderData.productQuantity}`;
+        } else {
+            productList.textContent = 'No product information';
         }
         
-        // Display order data on page
-        function displayOrderData() {
-            const orderData = getOrderDataFromUrl();
-            
-            // Fill in customer details
-            document.getElementById('customer-name').textContent = orderData.name || '-';
-            document.getElementById('customer-phone').textContent = orderData.phone || '-';
-            document.getElementById('customer-email').textContent = orderData.email || '-';
-            document.getElementById('customer-address').textContent = orderData.address || '-';
-            
-            // Fill in product details
-            const productList = document.getElementById('product-list');
-            if (orderData.productCode) {
-                productList.innerHTML = `${orderData.productCode} - ${orderData.productName} x ${orderData.productQuantity}`;
-            } else {
-                productList.textContent = 'No product information';
-            }
-            
-            // Fill in notes
-            const notesElement = document.getElementById('customer-notes');
-            if (orderData.notes && orderData.notes !== 'None') {
-                notesElement.textContent = orderData.notes;
-            } else {
-                notesElement.textContent = 'None';
-            }
+        // Fill in notes
+        const notesElement = document.getElementById('customer-notes');
+        if (orderData.notes && orderData.notes !== 'None') {
+            notesElement.textContent = orderData.notes;
+        } else {
+            notesElement.textContent = 'None';
         }
+    }
+    
+    // Generate WhatsApp message URL
+    function generateWhatsAppMessage() {
+        const orderData = getOrderDataFromUrl();
+        const whatsappNumber = '60198428621';
         
-        // Generate WhatsApp message URL
-        function generateWhatsAppMessage() {
-            const orderData = getOrderDataFromUrl();
-            const whatsappNumber = '60198428621';
-            
-            const message = `*Hi Q13 DYNAMIC!*
+        const message = `*Hi Q13 DYNAMIC!*
 I would like to order this product..
 
 *Details :*
@@ -324,36 +325,52 @@ ${orderData.productCode} - ${orderData.productName} x ${orderData.productQuantit
 ${orderData.notes || 'None'}
 
 *- Via Website*`;
-            
-            const encodedMessage = encodeURIComponent(message);
-            return `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-        }
         
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Display order data
-            displayOrderData();
+        const encodedMessage = encodeURIComponent(message);
+        return `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        // Display order data
+        displayOrderData();
+        
+        // Back to home button - UPDATED TO USE THE URL PARAMETER
+        document.getElementById('back-home-btn').addEventListener('click', () => {
+            const orderData = getOrderDataFromUrl();
             
-            // Back to home button
-            document.getElementById('back-home-btn').addEventListener('click', () => {
-               window.history.back();
-            });
-            
-            // Resend to WhatsApp button
-            document.getElementById('resend-whatsapp-btn').addEventListener('click', () => {
-                const whatsappUrl = generateWhatsAppMessage();
-                window.open(whatsappUrl, '_blank');
-            });
-            
-            // Try to auto-open WhatsApp on page load (for initial redirect)
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('autoOpen') === 'true') {
-                setTimeout(() => {
-                    const whatsappUrl = generateWhatsAppMessage();
-                    window.open(whatsappUrl, '_blank');
-                }, 1000);
+            // Use the URL from parameters, or default to home page
+            if (orderData.url && orderData.url !== 'undefined') {
+                // Decode the URL if it's double-encoded
+                try {
+                    const decodedUrl = decodeURIComponent(orderData.url);
+                    window.location.href = decodedUrl;
+                } catch (e) {
+                    // If there's an error decoding, try using it directly
+                    window.location.href = orderData.url;
+                }
+            } else {
+                // Fallback to home page
+                window.location.href = 'https://q13dynamic-vr.com/';
             }
         });
-    </script>
+        
+        // Resend to WhatsApp button
+        document.getElementById('resend-whatsapp-btn').addEventListener('click', () => {
+            const whatsappUrl = generateWhatsAppMessage();
+            window.open(whatsappUrl, '_blank');
+        });
+        
+        // Try to auto-open WhatsApp on page load (for initial redirect)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('autoOpen') === 'true') {
+            setTimeout(() => {
+                const whatsappUrl = generateWhatsAppMessage();
+                window.open(whatsappUrl, '_blank');
+            }, 1000);
+        }
+    });
+</script>
 </body>
 </html>
+
