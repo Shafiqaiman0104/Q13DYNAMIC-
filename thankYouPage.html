@@ -335,16 +335,9 @@ ${orderData.notes || 'None'}
             displayOrderData();
             
             // Back to home button
-           document.getElementById('back-home-btn').addEventListener('click', () => {
-    // Use replaceState to prevent going back to the same state
-    if (window.history.length > 1) {
-        // Go back two steps to skip the order submission page
-        window.history.go(-2);
-    } else {
-        // If no history, go to homepage
-        window.location.href = 'index.html';
-    }
-});
+            document.getElementById('back-home-btn').addEventListener('click', () => {
+               window.history.back();
+            });
             
             // Resend to WhatsApp button
             document.getElementById('resend-whatsapp-btn').addEventListener('click', () => {
@@ -363,5 +356,4 @@ ${orderData.notes || 'None'}
         });
     </script>
 </body>
-
 </html>
