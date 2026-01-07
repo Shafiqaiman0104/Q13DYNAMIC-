@@ -1051,7 +1051,7 @@
         .submit-order-btn {
             flex: 1;
             padding: 16px;
-            background-color: var(--primary);
+            background-color: #25D366;
             color: white;
             border: none;
             border-radius: 10px;
@@ -1066,7 +1066,7 @@
         }
 
         .submit-order-btn:hover:not(:disabled) {
-            background-color: var(--primary-dark);
+            background-color: #008331;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }
@@ -2141,14 +2141,14 @@
                 <h3 style="margin-bottom: 20px; color: var(--dark);">Enter Your Order ID</h3>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="order-id-input" class="form-control" 
-                           placeholder="Enter your Order ID (e.g., sh12af18)" 
+                           placeholder="Enter your Order ID" 
                            style="flex: 1;">
                     <button class="filter-btn" id="track-order-btn" style="background-color: var(--primary); color: white; white-space: nowrap;">
                         <i class="fas fa-search"></i> Track Order
                     </button>
                 </div>
                 <p style="margin-top: 10px; font-size: 0.9rem; color: var(--dark-gray);">
-                    Your Order ID is the Bill URL sent to your email after purchase.<br>For example https://toyyibpay.com/sh12af18 the sh12af18 is the order id.
+                    Your Order ID will be sent to your WhatsApps after purchase.<br>Need help? WhatsApp: +60198428621.
                 </p>
             </div>
 
@@ -2507,12 +2507,19 @@
             </div>
             
             <div class="cod-charge-info">
-                <strong>🔔 INFORMATION :</strong><br>
-                <strong>ℹ️ Only accept local bank (FPX)</strong><br>
-                📦 Estimated goods arrive in <strong>2 to 5 working days</strong><br>
-                <strong>❌ No Refund</strong><br>
-                Need help? Please Contact : 📞<strong>60198428621</strong>
-            </div>
+    <strong>🔔 PAYMENT INSTRUCTIONS:</strong><br><br>
+    <strong><i class="fab fa-whatsapp"></i> Manual Payment via WhatsApp</strong><br>
+    1. Complete your order details below<br>
+    2. Click "Send to WhatsApp" button<br>
+    3. You'll be redirected to WhatsApp with a prepared message<br>
+    4. Send the message to complete your order<br>
+    5. Our team will provide bank details via WhatsApp<br>
+    6. Send payment proof via WhatsApp<br>
+    7. We process once payment confirmed<br><br>
+    📦 Estimated delivery: <strong>2 to 5 working days</strong><br>
+    <strong>❌ No Refund</strong><br>
+    Need help? WhatsApp: <strong>+60198428621</strong>
+</div>
                         
             <form id="order-form">
                 <div class="form-group">
@@ -2568,8 +2575,8 @@
                 
                 <div class="order-buttons">
                     <button type="submit" class="submit-order-btn" id="submit-order-btn">
-                        <i class="fas fa-shopping-cart"></i> Proceed to Payment
-                    </button>
+    <i class="fab fa-whatsapp"></i> Send to WhatsApp
+</button>
                     <button type="button" class="cancel-order-btn" id="cancel-order-btn">Cancel Order</button>
                 </div>
             </form>
@@ -2703,14 +2710,13 @@
                 <li>All content on this website remains the intellectual property of Q13 DYNAMIC, unless otherwise stated.</li>
             </ul>
             
-            <h2>4. ORDERS & PAYMENTS</h2>
-            <ul>
-                <li>Orders can be placed online through our website.</li>
-                <li><strong>Payment Method:</strong> FPX Online Banking (Malaysia only)</li>
-                <li><strong>Payment Gateway:</strong> toyyibPay</li>
-                <li>Orders will only be processed after successful payment confirmation.</li>
-                <li>We reserve the right to cancel any order due to stock unavailability, pricing errors, or suspected fraud.</li>
-            </ul>
+           <h2>4. ORDERS & PAYMENTS</h2>
+<ul>
+    <li>Orders can be placed online through our website.</li>
+    <li><strong>Payment Method:</strong> Manual bank transfer via WhatsApp</li>
+    <li><strong>Payment Process:</strong> After order submission, WhatsApp will open with order details. Complete payment via local bank transfer and send proof via WhatsApp.</li>
+    <li>Orders will only be processed after successful payment confirmation via WhatsApp.</li>
+</ul>
             
             <h2>5. DELIVERY POLICY</h2>
             <ul>
@@ -2731,6 +2737,24 @@
                 </ul>
                 <p>Customers are advised to inspect items upon receipt.</p>
             </div>
+
+<h2>ORDER MODIFICATION POLICY</h2>
+<div class="highlight">
+    <p><strong>Stock Availability & Order Modifications</strong></p>
+    <ul>
+        <li>All orders are subject to product availability.</li>
+        <li>In the event that a product is out of stock or unavailable, Q13 DYNAMIC reserves the right to:</li>
+        <ul style="margin-left: 20px;">
+            <li>Replace the item with a similar product of equal or greater value</li>
+            <li>Offer an alternative product at a different price point (with customer approval)</li>
+            <li>Partially fulfill the order and refund the unavailable item(s)</li>
+            <li>Cancel the specific unavailable item from the order</li>
+        </ul>
+        <li>Customers will be notified via WhatsApp or phone call if any modifications are required to their order.</li>
+        <li>Modified orders require customer confirmation before processing.</li>
+        <li>If a customer disagrees with the proposed modification, they may request a full refund for the unavailable item(s).</li>
+    </ul>
+</div>
             
             <h2>7. AGENT / AFFILIATE PROGRAM</h2>
             
@@ -4479,82 +4503,39 @@ function updateOrderSummary() {
     addDiscountCodeToSummary();
 }
 
-function generateToyyibPayLink(orderData) {
-    // ==============================
-    // TOYYIBPAY CREDENTIALS - UPDATE THESE!
-    // ==============================
-    const TOYYIBPAY_CATEGORY_CODE = '7vc5uxm8'; // Replace with your actual category code
-    const TOYYIBPAY_SECRET_KEY = 'xgyiyiwb-ij8m-48ll-p1g6-24sqtt00kpwl'; // Replace with your actual secret key
+function generateWhatsAppMessage(orderData) {
+    // WhatsApp number to send to
+    const whatsappNumber = '60198428621';
     
-    // Calculate amount in cents (RM to sen)
-    const amountInSen = Math.round(orderData.totalPrice * 100);
-    
-    // Create unique reference number
-    const refNo = `${orderData.customerPhone}`;
+    // Format the message exactly as requested
+    const message = `*Hi Q13 DYNAMIC!*
+I would like to order this product..
 
- // Calculate expiration time (5 minutes from now)
- const nowUtc = new Date();
-  const expiryMyTime = new Date(nowUtc.getTime() + (5 + 480) * 60 * 1000);
-  const formattedExpiry = expiryMyTime.toISOString().split('.')[0].replace('T', ' ');
+*Details :*
+Name : ${orderData.customerName}
+Phone : ${orderData.customerPhone}
+Email : ${orderData.customerEmail}
+Address : ${orderData.deliveryAddress}
+
+*Product :*
+${orderData.productCode} - ${orderData.productName} x ${orderData.productQuantity}
+
+*Special Request / Notes :*
+${orderData.customerNote || 'None'}
+
+*- Via Website*`;
     
-    // ==============================
-    // TOYYIBPAY API ENDPOINT
-    // ==============================
-    const TOYYIBPAY_API_URL = 'https://toyyibpay.com/index.php/api/createBill';
+    // URL encode the message
+    const encodedMessage = encodeURIComponent(message);
     
-    // ==============================
-    // CREATE FORM DATA FOR API CALL
-    // ==============================
-    const formData = new FormData();
-    formData.append('userSecretKey', TOYYIBPAY_SECRET_KEY);
-    formData.append('categoryCode', TOYYIBPAY_CATEGORY_CODE);
-    formData.append('billName', `Q13 DYNAMIC - ${orderData.productCode}`);
-    formData.append('billDescription', `Purchase: ${orderData.productCode} ${orderData.productName} (Qty: ${orderData.productQuantity})`);
-    formData.append('billPriceSetting', '1');
-    formData.append('billPayorInfo', '1');
-    formData.append('billAmount', amountInSen.toString());
-    formData.append('billReturnUrl', 'https://q13dynamic-vr.com/pay.html');
-    formData.append('billCallbackUrl', 'https://script.google.com/macros/s/AKfycbxhuHO7-6fGOIS-BF9kUYHIBNzPVspo3MTyRIZvZnRY0WzuYOavP_gPoG_OJyuTShPq/exec');
-    formData.append('billExternalReferenceNo', refNo);
-    formData.append('billTo', orderData.customerName);
-    formData.append('billEmail', orderData.customerEmail);
-    formData.append('billPhone', orderData.customerPhone);
-    formData.append('billSplitPayment', '0');
-    formData.append('billSplitPaymentArgs', '');
-    formData.append('billPaymentChannel', '0');
-    formData.append('billContentEmail', 'Thank you for your purchase from Q13 DYNAMIC! Your fireworks order is being processed.');
-    formData.append('billChargeToCustomer', '1');
-    formData.append("billExpiryDate", formattedExpiry);
+    // Create WhatsApp URL (works on both mobile and desktop)
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
     
-    // ==============================
-    // MAKE API CALL TO TOYYIBPAY
-    // ==============================
-    return new Promise((resolve, reject) => {
-        fetch(TOYYIBPAY_API_URL, {
-            method: 'POST',
-            body: formData,
-            mode: 'cors'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data[0] && data[0].BillCode) {
-                // Success! Redirect to payment page
-                const paymentUrl = `https://toyyibpay.com/${data[0].BillCode}`;
-                resolve(paymentUrl);
-            } else {
-                // API returned error
-                console.error('ToyyibPay API Error:', data);
-                reject(new Error('Failed to create payment bill. Please try again.'));
-            }
-        })
-        .catch(error => {
-            console.error('ToyyibPay API Call Failed:', error);
-            reject(new Error('Payment gateway connection failed. Please try again.'));
-        });
-    });
+    return whatsappUrl;
 }
 
 // MODIFIED: Update the orderData object in handleOrderSubmit function
+// MODIFIED: Update the handleOrderSubmit function to open WhatsApp immediately
 async function handleOrderSubmit(event) {
     event.preventDefault();
     
@@ -4585,21 +4566,21 @@ async function handleOrderSubmit(event) {
         return;
     }
     
-        // Validate phone number - must start with 6 (no starting with 0)
+    // Validate phone number - must start with 6 (no starting with 0)
     // Remove all spaces, dashes, and plus signs
     const cleanedPhone = customerPhone.replace(/\s+|-|\+/g, '');
 
-// Check if phone has symbol
-if (/[+\-()]/.test(customerPhone)) {
-    alert('Phone number cannot contain symbols like +, -, (, ).\n\nPlease use only numbers (e.g., 601160801477).');
-    return;
-}
+    // Check if phone has symbol
+    if (/[+\-()]/.test(customerPhone)) {
+        alert('Phone number cannot contain symbols like +, -, (, ).\n\nPlease use only numbers (e.g., 601160801477).');
+        return;
+    }
 
-// Check if phone has spaces
-if (customerPhone.includes(' ')) {
-    alert('Phone number cannot contain spaces.\n\nPlease remove spaces (e.g., 601160801477 instead of 6011 6080 1477).');
-    return;
-}
+    // Check if phone has spaces
+    if (customerPhone.includes(' ')) {
+        alert('Phone number cannot contain spaces.\n\nPlease remove spaces (e.g., 601160801477 instead of 6011 6080 1477).');
+        return;
+    }
     
     // Check if phone starts with 0
     if (cleanedPhone.startsWith('0')) {
@@ -4632,7 +4613,7 @@ if (customerPhone.includes(' ')) {
         return;
     }
 
-       // Calculate prices with quantity
+    // Calculate prices with quantity
     const quantity = parseInt(productQuantity) || 1;
     const productPricePerUnit = currentOrderProduct.price || 0;
     const totalProductPrice = productPricePerUnit * quantity;
@@ -4666,7 +4647,7 @@ if (customerPhone.includes(' ')) {
         discountCode: discountCodeApplied ? DISCOUNT_AMOUNT : 0, // Agent discount code (5 or 0)
         userId: currentAgentId || "", // Agent ID from discount code
         customerName: customerName,
-        customerPhone: customerPhone,
+        customerPhone: cleanedPhone,
         customerEmail: customerEmail,
         deliveryAddress: deliveryAddress,
         spinPrize: spinDiscount,
@@ -4681,32 +4662,31 @@ if (customerPhone.includes(' ')) {
         
         if (sheetResponse && sheetResponse.success) {
             // Clear spin wheel prize after successful order
-            // This allows the user to spin again for their NEXT order
             clearSpinWheelPrize();
             
-            // Generate REAL ToyyibPay payment link
-            const paymentLink = await generateToyyibPayLink(orderData);
+            // Generate WhatsApp message
+            const whatsappUrl = generateWhatsAppMessage(orderData);
             
-            // Show confirmation message with discount info
-            let message = `Order submitted successfully!\n\n`;
-            message += `Product Price: RM ${currentOrderProduct.price.toFixed(2)}\n`;
-            message += `Product Quantity: ${quantity}\n`;
-            message += `Postage Fee: RM ${totalPostage.toFixed(2)} (${quantity} × RM ${postagePerUnit.toFixed(2)})\n`; // ADD THIS LINE
-            message += `Admin Fee: RM 1\n`;
-if (spinDiscount > 0) {
-    message += `Spin Wheel Discount: -RM ${spinDiscount.toFixed(2)}\n`;
-}
-if (discountCodeDiscount > 0) {
-    message += `Agent Discount Code: -RM ${discountCodeDiscount.toFixed(2)}\n`;
-}
-            message += `Total Amount: RM ${totalPrice.toFixed(2)}\n\n`;
-            message += `⚠️ IMPORTANT: Payment link expires in 5 minutes!\n\n`;
-            message += `You will now be redirected to ToyyibPay secure payment page.\n\n`;
+            // Prepare data for thank you page
+            const thankYouData = new URLSearchParams({
+                name: encodeURIComponent(customerName),
+                phone: encodeURIComponent(cleanedPhone),
+                email: encodeURIComponent(customerEmail),
+                address: encodeURIComponent(deliveryAddress),
+                productCode: encodeURIComponent(currentOrderProduct.code),
+                productName: encodeURIComponent(currentOrderProduct.name),
+                productQuantity: encodeURIComponent(quantity),
+                notes: encodeURIComponent(customerNote || 'None')
+            });
             
-            alert(message);
+            // FIRST: Try to open WhatsApp immediately (this works like the resend button)
+            const whatsappWindow = window.open(whatsappUrl, '_blank');
             
-            // Redirect to ToyyibPay payment page
-            window.location.href = paymentLink;
+            // THEN: Redirect to thank you page after a short delay
+            setTimeout(() => {
+                window.location.href = `thankYouPage.html?${thankYouData.toString()}`;
+            }, 500); // 0.5 second delay
+            
         } else {
             throw new Error('Failed to save order data. Please try again.');
         }
@@ -4721,7 +4701,7 @@ if (discountCodeDiscount > 0) {
         
         console.error('Order Submission Error:', error);
     }
-}     
+}
 
 // NEW FUNCTION: Send order data to Google Sheets
 async function sendOrderToGoogleSheets(orderData) {
