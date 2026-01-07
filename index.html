@@ -3178,7 +3178,7 @@ function getUrlParams() {
     return discountParam || '';
 }
 
-// Function to check if agent ID exists in database
+// MODIFIED: Function to check if agent ID exists AND has "approve" status
 async function validateAgentId(agentId) {
     if (!agentId) return false;
     
@@ -3191,15 +3191,23 @@ async function validateAgentId(agentId) {
             // Skip the header row (index 0) and check each agent row
             for (let i = 1; i < data.data.length; i++) {
                 const agent = data.data[i];
-                if (agent[0] === agentId) { // Agent ID is in first column
-                    return true;
+                // Column 0 = Agent ID, Column 6 = Status
+                if (agent[0] === agentId) {
+                    // Check if status is "approve" (case insensitive)
+                    const status = agent[5] || ''; // Column 6 (index 5)
+                    if (status.toLowerCase() === 'approve') {
+                        return { isValid: true, status: status };
+                    } else {
+                        // Agent exists but not approved
+                        return { isValid: false, status: status, reason: 'not_approved' };
+                    }
                 }
             }
         }
-        return false;
+        return { isValid: false, reason: 'not_found' };
     } catch (error) {
         console.error('Error validating agent ID:', error);
-        return false;
+        return { isValid: false, reason: 'error' };
     }
 }
 
@@ -3212,17 +3220,24 @@ async function applyDiscountCode(agentId) {
     // Small delay to ensure popup shows
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    const isValid = await validateAgentId(agentId);
+    const result = await validateAgentId(agentId);
     
     hideLoading();
     
-    if (isValid) {
+    if (result.isValid) {
         currentDiscountCode = agentId;
         currentAgentId = agentId;
         discountCodeApplied = true;
         return true;
     } else {
-        alert('Invalid Discount Code');
+        // Show different messages based on reason
+        if (result.reason === 'not_approved') {
+            alert('❌ Invalid Discount Code\n\nThis agent is not approved yet (Status: pending).\nPlease contact the agent or try another code.');
+        } else if (result.reason === 'not_found') {
+            alert('❌ Invalid Discount Code\n\nAgent ID not found in our database.');
+        } else {
+            alert('❌ Error validating discount code\n\nPlease try again later.');
+        }
         return false;
     }
 }
@@ -3250,11 +3265,11 @@ async function checkUrlForDiscountCode() {
         // Small delay to ensure popup shows
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        const isValid = await validateAgentId(agentIdFromUrl);
+        const result = await validateAgentId(agentIdFromUrl);
         
         hideLoading();
         
-        if (isValid) {
+        if (result.isValid) {
             // Auto-fill and disable the discount code field
             const discountInput = document.getElementById('discount-code');
             if (discountInput) {
@@ -3280,13 +3295,18 @@ async function checkUrlForDiscountCode() {
                 }
                 
                 // Show success message
-                alert('Agent discount code applied successfully! RM5 discount added.');
+                alert('✅ Agent discount code applied successfully!\nRM5 discount added.\nAgent Status: ' + result.status);
             }
         } else {
-            // Invalid discount code from URL - show warning but don't prevent user
-            console.warn('Invalid discount code in URL:', agentIdFromUrl);
-            // Optionally show a less intrusive notification
-            // You could add a small notification here if desired
+            // Show appropriate error message
+            if (result.reason === 'not_approved') {
+                alert('⚠️ Agent Not Approved\n\nAgent ID found but status is: pending\nDiscount code cannot be applied.\nPlease contact the agent or use a different code.');
+            } else if (result.reason === 'not_found') {
+                console.warn('Invalid agent ID in URL:', agentIdFromUrl);
+                // Don't show alert for not-found from URL - just log it
+            } else {
+                console.error('Error validating agent ID from URL:', result.reason);
+            }
         }
     }
 }
