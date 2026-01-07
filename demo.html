@@ -4490,22 +4490,22 @@ function generateWhatsAppMessage(orderData) {
     const whatsappNumber = '60198428621';
     
     // Format the message exactly as requested
-    const message = `Hi Q13 DYNAMIC!
+    const message = `*Hi Q13 DYNAMIC!*
 I would like to order this product..
 
-Details :
-${orderData.customerName}
-${orderData.customerPhone}
-${orderData.customerEmail}
-${orderData.deliveryAddress}
+*Details :*
+Name : ${orderData.customerName}
+Phone : ${orderData.customerPhone}
+Email : ${orderData.customerEmail}
+Address : ${orderData.deliveryAddress}
 
-Product :
+*Product :*
 ${orderData.productCode} - ${orderData.productName} x ${orderData.productQuantity}
 
-Special Request / Notes : (if have)
+*Special Request / Notes :*
 ${orderData.customerNote || 'None'}
 
-Total Amount: RM ${orderData.totalPrice.toFixed(2)}`;
+*- Via Website*`;
     
     // URL encode the message
     const encodedMessage = encodeURIComponent(message);
