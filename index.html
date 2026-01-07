@@ -4667,7 +4667,10 @@ async function handleOrderSubmit(event) {
             // Generate WhatsApp message
             const whatsappUrl = generateWhatsAppMessage(orderData);
             
-            // Prepare data for thank you page
+            // Get the current page URL including any parameters
+            const currentPageUrl = encodeURIComponent(window.location.href);
+            
+            // Prepare data for thank you page - ADD THE URL PARAMETER
             const thankYouData = new URLSearchParams({
                 name: encodeURIComponent(customerName),
                 phone: encodeURIComponent(cleanedPhone),
@@ -4676,7 +4679,8 @@ async function handleOrderSubmit(event) {
                 productCode: encodeURIComponent(currentOrderProduct.code),
                 productName: encodeURIComponent(currentOrderProduct.name),
                 productQuantity: encodeURIComponent(quantity),
-                notes: encodeURIComponent(customerNote || 'None')
+                notes: encodeURIComponent(customerNote || 'None'),
+                url: currentPageUrl  // ADD THIS LINE - This is the key change
             });
             
             // FIRST: Try to open WhatsApp immediately (this works like the resend button)
