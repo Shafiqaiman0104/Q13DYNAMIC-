@@ -21,6 +21,29 @@
 
 <meta name="description" content="Discover premium fireworks collection with real demonstration videos. Filter by specifications to find perfect fireworks for your celebration.">
 <meta name="keywords" content="fireworks, q13 dynamic, premium fireworks, celebration, malaysia fireworks">
+
+<script>
+    // Detect if the URL contains "qr.jpeg"
+    if (window.location.href.includes('qr.jpeg')) {
+        // Update meta tags for QR code page
+        document.querySelector('meta[property="og:image"]').setAttribute('content', 'https://q13dynamic-vr.com/qr.jpeg');
+        document.querySelector('meta[name="twitter:image"]').setAttribute('content', 'https://q13dynamic-vr.com/qr.jpeg');
+        document.querySelector('meta[property="og:description"]').setAttribute('content', 'Click here to scan the official QR PAY (MAYBANK) by Q13DYNAMIC.');
+        document.querySelector('meta[name="twitter:description"]').setAttribute('content', 'Click here to scan the official QR PAY (MAYBANK) by Q13DYNAMIC.');
+        document.querySelector('meta[name="description"]').setAttribute('content', 'Click here to scan the official QR PAY (MAYBANK) by Q13DYNAMIC.');
+        
+        // Also update the page title for QR code page
+        document.title = 'Q13 DYNAMIC - QR Payment';
+    } else {
+        // Keep default meta tags for main website
+        document.querySelector('meta[property="og:image"]').setAttribute('content', 'https://q13dynamic-vr.com/Q13LOGO.png');
+        document.querySelector('meta[name="twitter:image"]').setAttribute('content', 'https://q13dynamic-vr.com/Q13LOGO.png');
+        document.querySelector('meta[property="og:description"]').setAttribute('content', 'Discover premium fireworks collection with real demonstration videos. Filter by specifications to find perfect fireworks for your celebration.');
+        document.querySelector('meta[name="twitter:description"]').setAttribute('content', 'Discover premium fireworks collection with real demonstration videos. Filter by specifications to find perfect fireworks for your celebration.');
+        document.querySelector('meta[name="description"]').setAttribute('content', 'Discover premium fireworks collection with real demonstration videos. Filter by specifications to find perfect fireworks for your celebration.');
+    }
+</script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
