@@ -3316,7 +3316,7 @@ async function checkUrlForDiscountCode() {
         } else {
             // Show appropriate error message
             if (result.reason === 'not_approved') {
-                alert(⚠️ Agent Not Approved\n\nAgent ID found but status is: pending\nDiscount code cannot be applied.\nPlease contact the agent or use a different code.');
+                alert('⚠️ Agent Not Approved\n\nAgent ID found but status is: pending\nDiscount code cannot be applied.\nPlease contact the agent or use a different code.');
             } else if (result.reason === 'not_found') {
                 console.warn('Invalid agent ID in URL:', agentIdFromUrl);
                 // Don't show alert for not-found from URL - just log it
