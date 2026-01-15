@@ -2965,6 +2965,7 @@ const AGENT_DATABASE_URL = 'https://script.google.com/macros/s/AKfycbwL86AaXKMwV
         let fireworksData = [];
         let filteredData = [];
         let currentOrderProduct = null;
+        let currentDownline = ""; // NEW: To store downline agent ID
 
 // Add these global variables at the top with other global variables
 let currentDiscountCode = '';
@@ -3227,15 +3228,27 @@ async function validateAgentId(agentId) {
             // Skip the header row (index 0) and check each agent row
             for (let i = 1; i < data.data.length; i++) {
                 const agent = data.data[i];
-                // Column 0 = Agent ID, Column 6 = Status
+                // Column 0 = Agent ID, Column 5 = Status (index 5)
                 if (agent[0] === agentId) {
                     // Check if status is "approve" (case insensitive)
                     const status = agent[5] || ''; // Column 6 (index 5)
                     if (status.toLowerCase() === 'approve') {
-                        return { isValid: true, status: status };
+                        // Return agent data including upline
+                        return { 
+                            isValid: true, 
+                            status: status,
+                            agentId: agent[0],
+                            upline: agent[9] || '',        // Column 10 (index 9)
+                            downlineStatus: agent[10] || 'unqualified' // Column 11 (index 10)
+                        };
                     } else {
                         // Agent exists but not approved
-                        return { isValid: false, status: status, reason: 'not_approved' };
+                        return { 
+                            isValid: false, 
+                            status: status, 
+                            reason: 'not_approved',
+                            agentId: agent[0]
+                        };
                     }
                 }
             }
@@ -3264,6 +3277,12 @@ async function applyDiscountCode(agentId) {
         currentDiscountCode = agentId;
         currentAgentId = agentId;
         discountCodeApplied = true;
+        
+        // Store the upline data for later use
+        if (result.upline) {
+            console.log('Agent has upline:', result.upline);
+        }
+        
         return true;
     } else {
         // Show different messages based on reason
@@ -3332,13 +3351,18 @@ async function checkUrlForDiscountCode() {
                 
                 // Show success message
                 alert('✅ Agent discount code applied successfully!\nRM5 discount added.\nAgent Status: ' + result.status);
+                
+                // Log upline info for debugging
+                if (result.upline) {
+                    console.log('Agent has upline:', result.upline);
+                }
             }
 
- // ALSO: Auto-fill the upline field in agent form if user is on agent page
-    const uplineInput = document.getElementById('agent-upline');
-    if (uplineInput) {
-        uplineInput.value = agentIdFromUrl;
-    }
+            // ALSO: Auto-fill the upline field in agent form if user is on agent page
+            const uplineInput = document.getElementById('agent-upline');
+            if (uplineInput) {
+                uplineInput.value = agentIdFromUrl;
+            }
 
         } else {
             // Show appropriate error message
@@ -4770,21 +4794,50 @@ async function handleOrderSubmit(event) {
     }
 }
 
-// NEW FUNCTION: Send order data to Google Sheets
+// UPDATED: Send order data to Google Sheets with upline/downline logic
 async function sendOrderToGoogleSheets(orderData) {
     try {
+        // NEW: If we have an agent ID, we need to check upline and downline status
+        let downlineValue = "";
+        
+        if (currentAgentId) {
+            // Fetch agent data to check upline and downline status
+            const agentData = await fetchAgentData(currentAgentId);
+            
+            if (agentData) {
+                // Check if agent has an upline
+                if (agentData.upline) {
+                    // Fetch upline agent data
+                    const uplineData = await fetchAgentData(agentData.upline);
+                    
+                    if (uplineData) {
+                        // Check downline status of upline agent
+                        if (uplineData.downlineStatus === 'qualified') {
+                            downlineValue = uplineData.agentId; // Set downline to upline agent ID
+                        }
+                        // If downlineStatus is 'unqualified', downlineValue remains empty
+                    }
+                }
+            }
+        }
+        
+        // Add the downline value to orderData
+        orderData.downline = downlineValue;
+        // Store for later use if needed
+        currentDownline = downlineValue;
+        
+        console.log('Submitting order with downline:', downlineValue);
+        
         const response = await fetch(ORDER_DATABASE_URL, {
             method: 'POST',
-            mode: 'no-cors', // Important for Google Apps Script
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(orderData)
         });
         
-        // Note: With no-cors mode, we can't read the response
-        // But we assume it's successful if no network error
-        return { success: true };
+        return { success: true, downline: downlineValue };
         
     } catch (error) {
         console.error('Error sending to Google Sheets:', error);
@@ -5456,6 +5509,40 @@ async function handleAgentSubmit(event) {
         // Re-enable submit button
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Submit Application';
+    }
+}
+
+// NEW: Function to fetch agent data including upline and downline status
+async function fetchAgentData(agentId) {
+    try {
+        const response = await fetch(AGENT_DATABASE_URL);
+        if (!response.ok) {
+            console.error('Failed to fetch agent data');
+            return null;
+        }
+        
+        const data = await response.json();
+        if (data.success && data.data) {
+            // Skip header row (index 0)
+            for (let i = 1; i < data.data.length; i++) {
+                const agent = data.data[i];
+                // Column indices based on your AGENT_DATABASE_URL code:
+                // Column 0 = Agent ID
+                // Column 9 = Upline (index 9)
+                // Column 10 = Downline Status (index 10)
+                if (agent[0] === agentId) {
+                    return {
+                        agentId: agent[0],
+                        upline: agent[9] || '',        // Column 10 (index 9)
+                        downlineStatus: agent[10] || 'unqualified' // Column 11 (index 10)
+                    };
+                }
+            }
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching agent data:', error);
+        return null;
     }
 }
 
