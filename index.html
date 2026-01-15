@@ -2041,6 +2041,17 @@
             border-left: 4px solid var(--primary);
             margin: 15px 0;
         }
+
+/* Add this to your CSS section */
+#agent-upline {
+    display: none !important;
+}
+
+/* You might also want to hide the label and description */
+.form-group label[for="agent-upline"],
+.form-group label[for="agent-upline"] + p {
+    display: none !important;
+}
     </style>
 </head>
 <body>
@@ -2290,6 +2301,15 @@
                     <textarea id="agent-address" class="form-control" rows="3" required 
                               placeholder="Enter your complete address"></textarea>
                 </div>
+
+<!-- ADD THIS NEW FIELD -->
+<div class="form-group">
+    <label for="agent-upline">Upline (optional)</label>
+    <input type="text" id="agent-upline" class="form-control" 
+           placeholder="Enter your upline agent ID (if any)">
+    <p style="font-size: 0.85rem; color: var(--dark-gray); margin-top: 5px;">
+    </p>
+</div>
                 
                 <div class="form-group" id="agent-id-preview" style="display: none;">
                     <label>Your Agent ID will be:</label>
@@ -3313,6 +3333,13 @@ async function checkUrlForDiscountCode() {
                 // Show success message
                 alert('✅ Agent discount code applied successfully!\nRM5 discount added.\nAgent Status: ' + result.status);
             }
+
+ // ALSO: Auto-fill the upline field in agent form if user is on agent page
+    const uplineInput = document.getElementById('agent-upline');
+    if (uplineInput) {
+        uplineInput.value = agentIdFromUrl;
+    }
+
         } else {
             // Show appropriate error message
             if (result.reason === 'not_approved') {
@@ -5329,6 +5356,7 @@ async function handleAgentSubmit(event) {
     const phone = document.getElementById('agent-phone').value.trim();
     const email = document.getElementById('agent-email').value.trim();
     const address = document.getElementById('agent-address').value.trim();
+    const upline = document.getElementById('agent-upline').value.trim(); // ADD THIS LINE
     
     // Validate required fields
     if (!name || !phone || !email || !address) {
@@ -5394,7 +5422,8 @@ async function handleAgentSubmit(event) {
         name: name,
         phone: cleanedPhone, // Use cleaned phone number
         email: email,
-        address: address
+        address: address,
+        upline: upline // ADD THIS LINE
     };
     
     // Disable submit button
@@ -5440,6 +5469,7 @@ async function submitAgentForm(formData) {
         url.searchParams.append('phone', formData.phone);
         url.searchParams.append('email', formData.email);
         url.searchParams.append('address', formData.address);
+        url.searchParams.append('upline', formData.upline || ''); // ADD THIS LINE
         
         const response = await fetch(url, {
             method: 'POST',
