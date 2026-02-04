@@ -3636,9 +3636,10 @@ function generateStarHTML(rating) {
 
 // Add this function to calculate Minimum Order Quantity
 function calculateMOQ(price) {
-    if (price < 100) return 3;
-    if (price < 200) return 2;
-    return 1;
+    if (price < 30) return 5;  // NEW: Price below 30 → MOQ 5
+    if (price < 100) return 3; // Price 30-99 → MOQ 3
+    if (price < 200) return 2; // Price 100-199 → MOQ 2
+    return 1;                  // Price 200+ → MOQ 1
 }
 
 // SPIN WHEEL FUNCTIONALITY
