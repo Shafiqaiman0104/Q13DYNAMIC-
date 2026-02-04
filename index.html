@@ -4388,8 +4388,11 @@ if (durationValue !== "all") {
                 `;
                 return;
             }
-            
-            data.forEach(item => {
+
+    // ADD THIS: Sort by price before displaying
+    const sortedData = [...data].sort((a, b) => a.price - b.price);            
+
+            sortedData.forEach(item => {
                 const card = createFireworkCard(item);
                 catalogContainer.appendChild(card);
             });
@@ -4974,6 +4977,9 @@ function handleData(response) {
         // Remove any invalid items
         fireworksData = fireworksData.filter(item => item.code && item.name);
 
+  // ADD THIS: Sort by price (lowest first)
+        fireworksData.sort((a, b) => a.price - b.price);
+
         // ADD THIS LINE: Calculate min/max values for star rating
         calculateMinMaxValues(fireworksData);
         
@@ -5221,6 +5227,10 @@ document.getElementById('product-quantity').addEventListener('input', updateOrde
             // Set up filter button events
             applyFiltersBtn.addEventListener("click", () => {
                 const filteredData = filterFireworks();
+
+  // ADD THIS: Sort filtered results by price (lowest first)
+    filteredData.sort((a, b) => a.price - b.price);
+
                 populateCatalog(filteredData);
                 filteredCountElement.textContent = filteredData.length;
             });
